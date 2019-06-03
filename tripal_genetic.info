@@ -1,0 +1,6 @@
+name = Tripal Genetic
+description = Provides support for genetic data incuding data loaders.
+core = 7.x
+package = Tripal Extensions
+
+dependencies[] = tripal
