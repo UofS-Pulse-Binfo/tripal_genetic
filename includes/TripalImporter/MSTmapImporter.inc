@@ -154,6 +154,7 @@ m9	5.009
     $form['software_version'] = [
       '#type' => 'textfield',
       '#title' => 'Mapping Software Version',
+      '#required' => TRUE,
       '#description' => 'The version of the above mapping software which was used.',
     ];
 
@@ -187,6 +188,7 @@ m9	5.009
     // All values provided by the user in the Importer's form widgets are
     // made available to us here by the Class' arguments member variable.
     $arguments = $this->arguments['run_args'];
+    print "Arguements supplied include:" . print_r($arguments, TRUE);
 
     // The path to the uploaded file is always made available using the
     // 'files' argument. The importer can support multiple files, therefore
@@ -194,5 +196,47 @@ m9	5.009
     // where the file is located on the server.
     $file_path = $this->arguments['files'][0]['file_path'];
 
+    // Save map meta-data.
+    $featuremap_id = $this->loadMapMetadata($arguments);
+
+    // Save analysis details.
+
+    // Save Map positions (file).
+    
+  }
+
+  /**
+   * Creater featuremap and featuremapprop records.
+   */
+  public function loadMapMetadata($args) {
+
+    $feature_map = chado_insert_record('featuremap', [
+      'name' => $args['name'],
+      'description' => $args['description'],
+    ]);
+
+    if (!empty($feature_map)) {
+      $mapid = $feature_map['featuremap_id'];
+
+      // Create Analysis.
+      $analysis = chado_insert_record('analysis', [
+        'name' => 'Generate '.$args['name'],
+        'program' => $args['software_name'],
+        'programversion' => $args['software_version'],
+        'description' => $args['analysis_description'],
+      ]);
+
+      /*
+      chado_insert_record('featuremap_analysis', [
+        'analysis_id' => $analysis['analysis_id'],
+        'featuremap_id' => $mapid,
+      ]);
+      */
+
+    //chado_insert_property(
+      //['table' => 'featuremap', 'id' => $featuremap->featuremap_id],
+    //);
+
+    }
   }
 }
