@@ -56,6 +56,6 @@ function tripal_genetic_enable() {
       ],
     ],
   ];
-  chado_create_custom_table($table, $schema);
+  chado_create_custom_table($table, $schema, TRUE, NULL, FALSE);
 
 }
