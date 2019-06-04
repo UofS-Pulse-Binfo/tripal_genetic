@@ -10,6 +10,7 @@ class MSTmapImporter extends TripalImporter {
    * The name of this loader.
    *
    * This name will be presented to the site user.
+   *
    * @var string
    */
   public static $name = 'MSTmap Importer';
@@ -18,6 +19,7 @@ class MSTmapImporter extends TripalImporter {
    * The machine name for this loader.
    *
    * This name will be used to construct the URL for the loader.
+   *
    * @var string
    */
   public static $machine_name = 'tripal_mstmap_loader';
@@ -26,12 +28,14 @@ class MSTmapImporter extends TripalImporter {
    * A brief description for this loader.
    *
    * This description will be presented to the site user.
+   *
    * @var string
    */
   public static $description = 'Loads genetic maps (standard MSTmap format).';
 
   /**
    * An array containing the extensions of allowed file types.
+   *
    * @var array
    */
   public static $file_types = ['txt', 'tsv'];
@@ -40,6 +44,7 @@ class MSTmapImporter extends TripalImporter {
    * Provides information to the user about the file upload.
    *
    * Typically this may include a description of the file types allowed.
+   *
    * @var string
    */
   public static $upload_description = 'MSTmap format consists of a TSV file listing the positions of markers in a genetic map. Each linkage group is labelled with it\'s name followed by a 2-column format: marker name, marker position (centimorgans). For example, <pre>
@@ -57,6 +62,7 @@ m9	5.009
 
   /**
    * Indicates the methods that the file uploader will support.
+   *
    * @var array
    */
   public static $methods = [
@@ -73,7 +79,8 @@ m9	5.009
    *
    * We create our own analysis record based on information provided and thus
    * do not need to require pre-existing analysis to be linked.
-   * @var boolean
+   *
+   * @var bool
    */
   public static $use_analysis = FALSE;
 
