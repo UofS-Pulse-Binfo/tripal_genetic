@@ -3,6 +3,7 @@ namespace Tests;
 
 use StatonLab\TripalTestSuite\DBTransaction;
 use StatonLab\TripalTestSuite\TripalTestCase;
+use Faker\Factory;
 
 class mstImporterTest extends TripalTestCase {
   // Uncomment to auto start and rollback db transactions per test method.
@@ -44,39 +45,31 @@ class mstImporterTest extends TripalTestCase {
   }
 
   public function provideMapMetadata() {
+    $faker = Factory::create();    
     $set = [];
 
     // Comprehensive (all form elements filled out.
     $set[] = [[
-      'name' => 'Single Linkage Group TEST',
-      'pub_map_name' => 'Something much more impressive',
+      'name' => $faker->words(4, TRUE),
+      'pub_map_name' => $faker->words(5, TRUE),
       'species_abbrev' => 'Tripalus',
       'units' => 'cM',
       'map_type' => 'linkage',
       'pop_type' => 'F2',
-      'pop_size' => '125',
-      'contact' => 'Developer of Tripal Genetic',
-      'software_name' => 'MSTmap',
-      'software_version' => '1.00-teststring',
-      'analysis_description' => 'I copied it from http://alumni.cs.ucr.edu/~yonghui/mstmap/example_map.txt',
-      'description' => 'More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. 
-
-More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. 
-
-More impressive jargon which makes this map sound spectacular. 
-More impressive jargon which makes this map sound spectacular. 
-More impressive jargon which makes this map sound spectacular. 
-More impressive jargon which makes this map sound spectacular. 
-
-More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular. More impressive jargon which makes this map sound spectacular.',
+      'pop_size' => $faker->randomDigitNotNull(),
+      'contact' => $faker->name,
+      'software_name' => $faker->name,
+      'software_version' => $faker->randomFloat(2, 1, 5),
+      'analysis_description' => $faker->sentences(2, TRUE),
+      'description' => $faker->paragraphs(5, TRUE),
     ]];
 
     // Only required.
     $set[] = [[
-      'name' => 'Lazy Map',
+      'name' => $faker->words(3, TRUE),
       'species_abbrev' => 'Tripalus',
-      'software_name' => 'MSTmap',
-      'software_version' => 'unknown',
+      'software_name' => $faker->name,
+      'software_version' => $faker->randomFloat(2,1,5),
     ]];
 
     return $set;
