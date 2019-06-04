@@ -18,6 +18,9 @@ before_script:
   - ./cc-test-reporter before-build --debug
   - GIT_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
   - GIT_COMMIT_SHA=$TRAVIS_PULL_REQUEST_SHA
+  - composer global require drupal/coder
+  - composer global require drupal/coder:^8.3.1
+  - composer global require dealerdirect/phpcodesniffer-composer-installer
 
 script:
   - docker run -it -d --rm --name tripal -v "$(pwd)":/modules/tripal_genetic statonlab/tripal3
