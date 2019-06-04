@@ -46,7 +46,12 @@ class MstImporterTest extends TripalTestCase {
       "Unable to find analysis for featuremap " . $args['featuremap_name']);
 
     // And connected to the current featuremap.
-    // @todo can't yet since featuremap_analysis doesn't exist.
+    $link = chado_select_record('featuremap_analysis', ['featuremap_analysis_id'], [
+      'analysis_id' => $analysis[0]->analysis_id,
+      'featuremap_id' => $map[0]->featuremap_id,
+    ]);
+    $this->assertNotEmpty($link,
+      "Unable to connect the featuremap to the analysis.");
 
   }
 

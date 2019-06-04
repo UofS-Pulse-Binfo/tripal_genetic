@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Prepares the site for tripal_genentic module.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function tripal_genetic_enable() {
+
+  $table = 'featuremap_analysis';
+  $schema = [
+    'table' => 'featuremap_analysis',
+    'description' => 'Maps analysis to the featuremaps they generated.',
+    'fields' => [
+      'featuremap_analysis_id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+      ],
+      'featuremap_id' => [
+        'size' => 'big',
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'analysis_id' => [
+        'size' => 'big',
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => [
+      'featuremap_analysis_id',
+    ],
+    'indexes' => [
+      'featuremap_analysis_idx1' => [
+        0 => 'featuremap_id',
+      ],
+      'featuremap_analysis_idx2' => [
+        0 => 'analysis_id',
+      ],
+    ],
+    'foreign keys' => [
+      'featuremap' => [
+        'table' => 'featuremap',
+        'columns' => [
+          'featuremap_id' => 'featuremap_id',
+        ],
+      ],
+      'analysis' => [
+        'table' => 'analysis',
+        'columns' => [
+          'analysis_id' => 'analysis_id',
+        ],
+      ],
+    ],
+  ];
+  chado_create_custom_table($table, $schema);
+
+}

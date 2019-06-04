@@ -246,10 +246,11 @@ m9  5.009
         'description' => $args['analysis_description'],
       ]);
 
-      // chado_insert_record('featuremap_analysis', [
-      // 'analysis_id' => $analysis['analysis_id'],
-      // 'featuremap_id' => $mapid,
-      // ]);
+      // Link the analysis to the map.
+      chado_insert_record('featuremap_analysis', [
+        'analysis_id' => $analysis['analysis_id'],
+        'featuremap_id' => $mapid,
+      ]);
 
       // chado_insert_property(
       // ['table' => 'featuremap', 'id' => $featuremap->featuremap_id],
