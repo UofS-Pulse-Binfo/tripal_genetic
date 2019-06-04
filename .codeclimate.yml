@@ -5,3 +5,8 @@ plugins:
     config:
       file_extensions: "php,inc,module"
       standard: "Drupal"
+    checks:
+      Drupal NamingConventions ValidVariableName LowerCamelName:
+        enabled: false
+      Drupal Commenting InlineComment SpacingAfter:
+        enabled: false
