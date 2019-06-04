@@ -30,20 +30,20 @@ class MstImporterTest extends TripalTestCase {
 
     // Check the featuremap was created.
     $map = chado_select_record('featuremap', ['featuremap_id'], [
-      'name' => $args['name'],
-      'description' => $args['description'],
+      'name' => $args['featuremap_name'],
+      'unittype_id' => ['name' => $args['featuremap_unittype_name']],
     ]);
     $this->assertNotEmpty($map,
-      "Unable to find featuremap record with name " . $args['name']);
+      "Unable to find featuremap record with name " . $args['featuremap_name']);
 
     // Check the analysis was created.
     $analysis = chado_select_record('analysis', ['analysis_id'], [
-      'program' => $args['software_name'],
-      'programversion' => $args['software_version'],
+      'program' => $args['analysis_program'],
+      'programversion' => $args['analysis_programversion'],
       'description' => $args['analysis_description'],
     ]);
     $this->assertNotEmpty($analysis,
-      "Unable to find analysis for featuremap " . $args['name']);
+      "Unable to find analysis for featuremap " . $args['featuremap_name']);
 
     // And connected to the current featuremap.
     // @todo can't yet since featuremap_analysis doesn't exist.
@@ -60,28 +60,31 @@ class MstImporterTest extends TripalTestCase {
     // Comprehensive (all form elements filled out.
     $set[] = [
       [
-        'name' => $faker->words(4, TRUE),
+        'featuremap_name' => $faker->words(4, TRUE),
         'pub_map_name' => $faker->words(5, TRUE),
-        'species_abbrev' => 'Tripalus',
-        'units' => 'cM',
+        // @todo look up or fake an organism here.
+        'organism_organism_id' => 1,
+        'featuremap_unittype_name' => 'cM',
         'map_type' => 'linkage',
         'pop_type' => 'F2',
         'pop_size' => $faker->randomDigitNotNull(),
-        'contact' => $faker->name,
-        'software_name' => $faker->name,
-        'software_version' => $faker->randomFloat(2, 1, 5),
+        'analysis_program' => $faker->name,
+        'analysis_programversion' => $faker->randomFloat(2, 1, 5),
         'analysis_description' => $faker->sentences(2, TRUE),
-        'description' => $faker->paragraphs(5, TRUE),
+        'featuremap_description' => $faker->paragraphs(5, TRUE),
       ],
     ];
 
     // Only required.
     $set[] = [
       [
-        'name' => $faker->words(3, TRUE),
-        'species_abbrev' => 'Tripalus',
-        'software_name' => $faker->name,
-        'software_version' => $faker->randomFloat(2, 1, 5),
+        'featuremap_name' => $faker->words(3, TRUE),
+        // @todo look up or fake an organism here.
+        'organism_organism_id' => 1,
+        'analysis_program' => $faker->name,
+        'analysis_programversion' => $faker->randomFloat(2, 1, 5),
+        'map_type' => $faker->name,
+        'featuremap_unittype_name' => 'cM',
       ],
     ];
 
@@ -107,7 +110,15 @@ class MstImporterTest extends TripalTestCase {
       "Failed to ensure we have a form.");
 
     // Check all required fields are present.
-    $required = ['name', 'species_abbrev', 'software_name', 'software_version'];
+    // DB Requirment:  analysis.program, analysis.programversion,
+    // organism.organism_id.
+    //
+    // Tripal Map Required: featuremap.name, featuremapprop.value (map_type),
+    // featuremap.unittype_id.
+    $required = [
+      'organism_organism_id', 'analysis_program', 'analysis_programversion',
+      'featuremap_name', 'map_type', 'featuremap_unittype_name',
+    ];
     foreach ($form as $key => $element) {
       if (isset($element['#required']) and $element['#required']) {
         $this->assertContains($key, $required,
@@ -126,10 +137,11 @@ class MstImporterTest extends TripalTestCase {
   public function testRun() {
     $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
     $args = [
-      'name' => 'Lazy Map',
-      'species_abbrev' => 'Tripalus',
-      'software_name' => 'MSTmap',
-      'software_version' => 'unknown',
+      'featuremap_name' => 'Lazy Map',
+      // @todo look up or fake an organism here.
+      'organism_organism_id' => 1,
+      'analysis_program' => 'MSTmap',
+      'analysis_programversion' => 'unknown',
     ];
 
     // Run the function.

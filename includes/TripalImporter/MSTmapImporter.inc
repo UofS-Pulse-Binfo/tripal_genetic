@@ -49,15 +49,15 @@ class MSTmapImporter extends TripalImporter {
    */
   public static $upload_description = 'MSTmap format consists of a TSV file listing the positions of markers in a genetic map. Each linkage group is labelled with it\'s name followed by a 2-column format: marker name, marker position (centimorgans). For example, <pre>
 group lg0
-m4	0.000
-m2	0.000
-m3	0.000
-m1	0.000
-m8	4.009
-m12	4.009
-m6	4.009
-m7	4.009
-m9	5.009
+m4  0.000
+m2  0.000
+m3  0.000
+m1  0.000
+m8  4.009
+m12  4.009
+m6  4.009
+m7  4.009
+m9  5.009
   </pre>';
 
   /**
@@ -90,7 +90,7 @@ m9	5.009
   public function form($form, &$form_state) {
 
     // Map Name.
-    $form['name'] = [
+    $form['featuremap_name'] = [
       '#type' => 'textfield',
       '#title' => 'Map Name',
       '#required' => TRUE,
@@ -104,17 +104,19 @@ m9	5.009
     ];
 
     // Organism.
-    $form['species_abbrev'] = [
-      '#type' => 'textfield',
-      '#title' => 'Species Abbreviation',
+    $form['organism_organism_id'] = [
+      '#type' => 'select',
+      '#title' => 'Map Species',
       '#required' => TRUE,
-      '#description' => "Species abbreviation for map: format is first 3 letters of genus + first 2 letters of species.  For example, glyma for Glycine max.  If more than one species is involved in the creation of the mapping population, spell out genus name, e.g. arachis.",
+      '#description' => "The species the map should be catagorized under based on the parental species. Cchoose interspecific if the parental species are different.",
+      '#options' => chado_get_organism_select_options(FALSE),
     ];
 
     // Units (cM default).
-    $form['units'] = [
+    $form['featuremap_unittype_name'] = [
       '#type' => 'hidden',
       '#title' => 'Map Units',
+      '#required' => TRUE,
       '#description' => 'The units the current map is in.',
       '#value' => 'cM',
     ];
@@ -123,6 +125,7 @@ m9	5.009
     $form['map_type'] = [
       '#type' => 'select',
       '#title' => 'Map Type',
+      '#required' => TRUE,
       '#description' => 'The type of map.',
       '#options' => [
         'linkage' => 'linkage',
@@ -154,17 +157,12 @@ m9	5.009
     // Parent 2.
 
     // Contact Person.
-    $form['contact'] = [
-      '#type' => 'textfield',
-      '#title' => 'Contact Person',
-      '#description' => 'The full name of the person to contact regarding this map.',
-    ];
 
     // Publication (if available).
 
     // Analysis Method.
     // Software for map construction (e.g MSTmap).
-    $form['software_name'] = [
+    $form['analysis_program'] = [
       '#type' => 'textfield',
       '#title' => 'Mapping Software',
       '#required' => TRUE,
@@ -172,7 +170,7 @@ m9	5.009
     ];
 
     // Software version.
-    $form['software_version'] = [
+    $form['analysis_programversion'] = [
       '#type' => 'textfield',
       '#title' => 'Mapping Software Version',
       '#required' => TRUE,
@@ -187,7 +185,7 @@ m9	5.009
     ];
 
     // Map Description.
-    $form['description'] = [
+    $form['featuremap_description'] = [
       '#type' => 'textarea',
       '#title' => 'Map Description',
       '#description' => "Description of the linkage map.  Suggested topics include the published source; alternative names for the map; types of molecular markers; parents, size, and type of mapping population; linkage group number, length, marker count, and sub-genome assignment; the map's total length and marker count; average inter-marker gap distance or marker density.  Indicate if there are PCR primers that amplify more than a single locus on the map, if there is a framework map available in addition to the full genetic map, and compare and contrast with other genetic maps.  Describe whether linkage groups are homeologues and to what extent common markers and conserved marker orders are present.  Record if the map was produced directly using a bi-parental mapping population or whether it is a consensus or composite map; if it is the latter then list and describe briefly the constituent mapping populations used in its construction.  Describe how many markers were screened against the parents, what number were polymorphic and used for population genotyping, and what proportion appeared on the final map.",
@@ -232,8 +230,9 @@ m9	5.009
   public function loadMapMetadata($args) {
 
     $feature_map = chado_insert_record('featuremap', [
-      'name' => $args['name'],
-      'description' => $args['description'],
+      'name' => $args['featuremap_name'],
+      'description' => $args['featuremap_description'],
+      'unittype_id' => ['name' => $args['featuremap_unittype_name']],
     ]);
 
     if (!empty($feature_map)) {
@@ -241,9 +240,9 @@ m9	5.009
 
       // Create Analysis.
       $analysis = chado_insert_record('analysis', [
-        'name' => 'Generate ' . $args['name'],
-        'program' => $args['software_name'],
-        'programversion' => $args['software_version'],
+        'name' => 'Generate ' . $args['featuremap_name'],
+        'program' => $args['analysis_program'],
+        'programversion' => $args['analysis_programversion'],
         'description' => $args['analysis_description'],
       ]);
 
