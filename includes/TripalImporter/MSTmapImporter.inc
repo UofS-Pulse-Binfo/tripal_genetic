@@ -1,25 +1,29 @@
 <?php
+
 /**
- * @file
- * Implements TripalImporter to provide support for loading of genetic map files.
+ * @class
+ * Provides support for loading of MST map files.
  */
 class MSTmapImporter extends TripalImporter {
 
   /**
-   * The name of this loader.  This name will be presented to the site
-   * user.
+   * The name of this loader.
+   *
+   * This name will be presented to the site user.
    */
   public static $name = 'MSTmap Importer';
 
   /**
-   * The machine name for this loader. This name will be used to construct
-   * the URL for the loader.
+   * The machine name for this loader.
+   *
+   * This name will be used to construct the URL for the loader.
    */
   public static $machine_name = 'tripal_mstmap_loader';
 
   /**
-   * A brief description for this loader.  This description will be
-   * presented to the site user.
+   * A brief description for this loader.
+   *
+   * This description will be presented to the site user.
    */
   public static $description = 'Loads genetic maps (standard MSTmap format).';
 
@@ -29,8 +33,9 @@ class MSTmapImporter extends TripalImporter {
   public static $file_types = ['txt', 'tsv'];
 
   /**
-   * Provides information to the user about the file upload.  Typically this
-   * may include a description of the file types allowed.
+   * Provides information to the user about the file upload.
+   *
+   * Typically this may include a description of the file types allowed.
    */
   public static $upload_description = 'MSTmap format consists of a TSV file listing the positions of markers in a genetic map. Each linkage group is labelled with it\'s name followed by a 2-column format: marker name, marker position (centimorgans). For example, <pre>
 group lg0
@@ -43,7 +48,7 @@ m12	4.009
 m6	4.009
 m7	4.009
 m9	5.009
-  </pre>'; 
+  </pre>';
 
   /**
    * Indicates the methods that the file uploader will support.
@@ -57,9 +62,11 @@ m9	5.009
     'file_remote' => TRUE,
   ];
 
-  /*
-   * We create our own analysis record based on information provided and thus do not need to require
-   * pre-existing analysis to be linked.
+  /**
+   * Do not require an analysis.
+   *
+   * We create our own analysis record based on information provided and thus
+   * do not need to require pre-existing analysis to be linked.
    */
   public static $use_analysis = FALSE;
 
@@ -178,7 +185,7 @@ m9	5.009
   /**
    * Validate the form input.
    */
-  public function formValidate($form, &$form_state) { }
+  public function formValidate($form, &$form_state) {}
 
   /**
    * Import the map.
@@ -188,7 +195,10 @@ m9	5.009
     // All values provided by the user in the Importer's form widgets are
     // made available to us here by the Class' arguments member variable.
     $arguments = $this->arguments['run_args'];
-    print "Arguements supplied include:" . print_r($arguments, TRUE);
+    print "Arguements supplied include:\n";
+    foreach ($arguments as $k => $v) {
+      print "\t-$k: $v\n";
+    }
 
     // The path to the uploaded file is always made available using the
     // 'files' argument. The importer can support multiple files, therefore
@@ -199,10 +209,7 @@ m9	5.009
     // Save map meta-data.
     $featuremap_id = $this->loadMapMetadata($arguments);
 
-    // Save analysis details.
-
-    // Save Map positions (file).
-    
+    // @todo Save Map positions (file).
   }
 
   /**
@@ -220,23 +227,22 @@ m9	5.009
 
       // Create Analysis.
       $analysis = chado_insert_record('analysis', [
-        'name' => 'Generate '.$args['name'],
+        'name' => 'Generate ' . $args['name'],
         'program' => $args['software_name'],
         'programversion' => $args['software_version'],
         'description' => $args['analysis_description'],
       ]);
 
-      /*
-      chado_insert_record('featuremap_analysis', [
-        'analysis_id' => $analysis['analysis_id'],
-        'featuremap_id' => $mapid,
-      ]);
-      */
+      // chado_insert_record('featuremap_analysis', [
+      // 'analysis_id' => $analysis['analysis_id'],
+      // 'featuremap_id' => $mapid,
+      // ]);
 
-    //chado_insert_property(
-      //['table' => 'featuremap', 'id' => $featuremap->featuremap_id],
-    //);
+      // chado_insert_property(
+      // ['table' => 'featuremap', 'id' => $featuremap->featuremap_id],
+      // );
 
     }
   }
+
 }

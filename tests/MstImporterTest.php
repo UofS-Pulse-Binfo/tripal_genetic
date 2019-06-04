@@ -1,16 +1,22 @@
 <?php
+
 namespace Tests;
 
 use StatonLab\TripalTestSuite\DBTransaction;
 use StatonLab\TripalTestSuite\TripalTestCase;
 use Faker\Factory;
 
-class mstImporterTest extends TripalTestCase {
+/**
+ * @class
+ * Load MSTmap files.
+ */
+class MstImporterTest extends TripalTestCase {
   // Uncomment to auto start and rollback db transactions per test method.
   use DBTransaction;
 
   /**
    * Test MSTmapImporter::loadMapMetadata().
+   *
    * @dataProvider provideMapMetadata
    */
   public function testLoadMapMetadata($args) {
@@ -28,7 +34,7 @@ class mstImporterTest extends TripalTestCase {
       'description' => $args['description'],
     ]);
     $this->assertNotEmpty($map,
-      "Unable to find featuremap record with name ".$args['name']);
+      "Unable to find featuremap record with name " . $args['name']);
 
     // Check the analysis was created.
     $analysis = chado_select_record('analysis', ['analysis_id'], [
@@ -37,40 +43,47 @@ class mstImporterTest extends TripalTestCase {
       'description' => $args['analysis_description'],
     ]);
     $this->assertNotEmpty($analysis,
-      "Unable to find analysis for featuremap ".$args['name']);
+      "Unable to find analysis for featuremap " . $args['name']);
 
     // And connected to the current featuremap.
     // @todo can't yet since featuremap_analysis doesn't exist.
 
   }
 
+  /**
+   * Data Provider to test the loading functions.
+   */
   public function provideMapMetadata() {
-    $faker = Factory::create();    
+    $faker = Factory::create();
     $set = [];
 
     // Comprehensive (all form elements filled out.
-    $set[] = [[
-      'name' => $faker->words(4, TRUE),
-      'pub_map_name' => $faker->words(5, TRUE),
-      'species_abbrev' => 'Tripalus',
-      'units' => 'cM',
-      'map_type' => 'linkage',
-      'pop_type' => 'F2',
-      'pop_size' => $faker->randomDigitNotNull(),
-      'contact' => $faker->name,
-      'software_name' => $faker->name,
-      'software_version' => $faker->randomFloat(2, 1, 5),
-      'analysis_description' => $faker->sentences(2, TRUE),
-      'description' => $faker->paragraphs(5, TRUE),
-    ]];
+    $set[] = [
+      [
+        'name' => $faker->words(4, TRUE),
+        'pub_map_name' => $faker->words(5, TRUE),
+        'species_abbrev' => 'Tripalus',
+        'units' => 'cM',
+        'map_type' => 'linkage',
+        'pop_type' => 'F2',
+        'pop_size' => $faker->randomDigitNotNull(),
+        'contact' => $faker->name,
+        'software_name' => $faker->name,
+        'software_version' => $faker->randomFloat(2, 1, 5),
+        'analysis_description' => $faker->sentences(2, TRUE),
+        'description' => $faker->paragraphs(5, TRUE),
+      ],
+    ];
 
     // Only required.
-    $set[] = [[
-      'name' => $faker->words(3, TRUE),
-      'species_abbrev' => 'Tripalus',
-      'software_name' => $faker->name,
-      'software_version' => $faker->randomFloat(2,1,5),
-    ]];
+    $set[] = [
+      [
+        'name' => $faker->words(3, TRUE),
+        'species_abbrev' => 'Tripalus',
+        'software_name' => $faker->name,
+        'software_version' => $faker->randomFloat(2, 1, 5),
+      ],
+    ];
 
     return $set;
   }
@@ -81,10 +94,10 @@ class mstImporterTest extends TripalTestCase {
   public function testLoaderForm() {
     $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
 
-     // Run the function.
+    // Run the function.
     module_load_include('inc', 'tripal_genetic', 'includes/TripalImporter/MSTmapImporter');
     $importer = new \MSTmapImporter();
-    $importer->create($run_args, $file); 
+    $importer->create($run_args, $file);
 
     $form = [];
     $form_state = [];
@@ -94,9 +107,9 @@ class mstImporterTest extends TripalTestCase {
       "Failed to ensure we have a form.");
 
     // Check all required fields are present.
-    $required = ['name','species_abbrev','software_name','software_version'];
-    foreach($form as $key => $element) {
-      if (isset($element['#required']) AND $element['#required']) {
+    $required = ['name', 'species_abbrev', 'software_name', 'software_version'];
+    foreach ($form as $key => $element) {
+      if (isset($element['#required']) and $element['#required']) {
         $this->assertContains($key, $required,
           "Unexpected form element, $key, marked as required.");
       }
@@ -119,22 +132,23 @@ class mstImporterTest extends TripalTestCase {
       'software_version' => 'unknown',
     ];
 
-     // Run the function.
+    // Run the function.
     module_load_include('inc', 'tripal_genetic', 'includes/TripalImporter/MSTmapImporter');
     $importer = new \MSTmapImporter();
-    $importer->create($args, $file); 
+    $importer->create($args, $file);
 
-    // Supress tripal errors
+    // Supress tripal errors.
     putenv("TRIPAL_SUPPRESS_ERRORS=TRUE");
     ob_start();
 
     $success = $importer->run();
 
-    // Clean the buffer and unset tripal errors suppression
+    // Clean the buffer and unset tripal errors suppression.
     ob_end_clean();
     putenv("TRIPAL_SUPPRESS_ERRORS");
 
     $this->assertNotFalse($success,
       "The run function should execute without errors.");
   }
+
 }
