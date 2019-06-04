@@ -77,9 +77,71 @@ More impressive jargon which makes this map sound spectacular. More impressive j
       'species_abbrev' => 'Tripalus',
       'software_name' => 'MSTmap',
       'software_version' => 'unknown',
-      'description' => 'Meh..',
     ]];
 
     return $set;
+  }
+
+  /**
+   * Test the form.
+   */
+  public function testLoaderForm() {
+    $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
+
+     // Run the function.
+    module_load_include('inc', 'tripal_genetic', 'includes/TripalImporter/MSTmapImporter');
+    $importer = new \MSTmapImporter();
+    $importer->create($run_args, $file); 
+
+    $form = [];
+    $form_state = [];
+    $form = $importer->form($form, $form_state);
+
+    $this->assertNotEmpty($form,
+      "Failed to ensure we have a form.");
+
+    // Check all required fields are present.
+    $required = ['name','species_abbrev','software_name','software_version'];
+    foreach($form as $key => $element) {
+      if (isset($element['#required']) AND $element['#required']) {
+        $this->assertContains($key, $required,
+          "Unexpected form element, $key, marked as required.");
+      }
+      else {
+        $this->assertNotContains($key, $required,
+          "Required field, $key, not marked as required.");
+      }
+    }
+  }
+
+  /**
+   * Test that run() runs...
+   */
+  public function testRun() {
+    $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
+    $args = [
+      'name' => 'Lazy Map',
+      'species_abbrev' => 'Tripalus',
+      'software_name' => 'MSTmap',
+      'software_version' => 'unknown',
+    ];
+
+     // Run the function.
+    module_load_include('inc', 'tripal_genetic', 'includes/TripalImporter/MSTmapImporter');
+    $importer = new \MSTmapImporter();
+    $importer->create($args, $file); 
+
+    // Supress tripal errors
+    putenv("TRIPAL_SUPPRESS_ERRORS=TRUE");
+    ob_start();
+
+    $success = $importer->run();
+
+    // Clean the buffer and unset tripal errors suppression
+    ob_end_clean();
+    putenv("TRIPAL_SUPPRESS_ERRORS");
+
+    $this->assertNotFalse($success,
+      "The run function should execute without errors.");
   }
 }
