@@ -4,7 +4,7 @@ namespace Tests;
 
 use StatonLab\TripalTestSuite\DBTransaction;
 use StatonLab\TripalTestSuite\TripalTestCase;
-use Faker\Factory;
+use StatonLab\TripalTestSuite\Database\Factory;
 
 /**
  * @class
@@ -53,22 +53,30 @@ class MstImporterTest extends TripalTestCase {
     $this->assertNotEmpty($link,
       "Unable to connect the featuremap to the analysis.");
 
+    // Check that there is the correct organism connected to this featuremap.
+    $org_link = chado_select_record('featuremap_organism', ['featuremap_organism_id'], [
+      'featuremap_id' => $map[0]->featuremap_id,
+      'organism_id' => $args['organism_organism_id'],
+    ]);
+    $this->assertNotEmpty($org_link,
+      "Unable to connect the featuremap to the correct organism.");
   }
 
   /**
    * Data Provider to test the loading functions.
    */
   public function provideMapMetadata() {
-    $faker = Factory::create();
+    $faker = \Faker\Factory::create();
     $set = [];
+
+    $organism = factory('chado.organism')->create();
 
     // Comprehensive (all form elements filled out.
     $set[] = [
       [
         'featuremap_name' => $faker->words(4, TRUE),
         'pub_map_name' => $faker->words(5, TRUE),
-        // @todo look up or fake an organism here.
-        'organism_organism_id' => 1,
+        'organism_organism_id' => $organism->organism_id,
         'featuremap_unittype_name' => 'cM',
         'map_type' => 'linkage',
         'pop_type' => 'F2',
@@ -84,8 +92,7 @@ class MstImporterTest extends TripalTestCase {
     $set[] = [
       [
         'featuremap_name' => $faker->words(3, TRUE),
-        // @todo look up or fake an organism here.
-        'organism_organism_id' => 1,
+        'organism_organism_id' => $organism->organism_id,
         'analysis_program' => $faker->name,
         'analysis_programversion' => $faker->randomFloat(2, 1, 5),
         'map_type' => $faker->name,
@@ -141,12 +148,13 @@ class MstImporterTest extends TripalTestCase {
    */
   public function testRun() {
     $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
+    $faker = \Faker\Factory::create();
+    $organism = factory('chado.organism')->create();
     $args = [
-      'featuremap_name' => 'Lazy Map',
-      // @todo look up or fake an organism here.
-      'organism_organism_id' => 1,
-      'analysis_program' => 'MSTmap',
-      'analysis_programversion' => 'unknown',
+      'featuremap_name' => $faker->name,
+      'organism_organism_id' => $organism->organism_id,
+      'analysis_program' => $faker->name,
+      'analysis_programversion' => $faker->randomFloat(2, 3, 5),
     ];
 
     // Run the function.

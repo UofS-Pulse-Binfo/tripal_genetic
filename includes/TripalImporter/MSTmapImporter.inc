@@ -252,6 +252,12 @@ m9  5.009
         'featuremap_id' => $mapid,
       ]);
 
+      // Link map to the organism.
+      chado_insert_record('featuremap_organism', [
+        'featuremap_id' => $mapid,
+        'organism_id' => $args['organism_organism_id'],
+      ]);
+
       // chado_insert_property(
       // ['table' => 'featuremap', 'id' => $featuremap->featuremap_id],
       // );
