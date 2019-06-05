@@ -60,6 +60,23 @@ class MstImporterTest extends TripalTestCase {
     ]);
     $this->assertNotEmpty($org_link,
       "Unable to connect the featuremap to the correct organism.");
+
+    // Check map_type and other properties
+    // (i.e. population_size, population_type, publication_map_name).
+    $properties = [
+      'map_type', 'population_type', 'population_size', 'published_map_name',
+    ];
+    foreach ($properties as $type_name) {
+      if (isset($args[$type_name]) and !empty($args[$type_name])) {
+        $prop = chado_select_record('featuremapprop', ['featuremapprop_id'], [
+          'type_id' => ['name' => $type_name],
+          'value' => $args[$type_name],
+          'featuremap_id' => $map[0]->featuremap_id,
+        ]);
+        $this->assertNotEmpty($prop,
+          "Unable to find property, $type_name, for map, " . $args['featuremap_name']);
+      }
+    }
   }
 
   /**
@@ -75,12 +92,12 @@ class MstImporterTest extends TripalTestCase {
     $set[] = [
       [
         'featuremap_name' => $faker->words(4, TRUE),
-        'pub_map_name' => $faker->words(5, TRUE),
+        'published_map_name' => $faker->words(5, TRUE),
         'organism_organism_id' => $organism->organism_id,
         'featuremap_unittype_name' => 'cM',
         'map_type' => 'linkage',
-        'pop_type' => 'F2',
-        'pop_size' => $faker->randomDigitNotNull(),
+        'population_type' => 'F2',
+        'population_size' => $faker->randomDigitNotNull(),
         'analysis_program' => $faker->name,
         'analysis_programversion' => $faker->randomFloat(2, 1, 5),
         'analysis_description' => $faker->sentences(2, TRUE),
@@ -155,6 +172,7 @@ class MstImporterTest extends TripalTestCase {
       'organism_organism_id' => $organism->organism_id,
       'analysis_program' => $faker->name,
       'analysis_programversion' => $faker->randomFloat(2, 3, 5),
+      'map_type' => $faker->name,
     ];
 
     // Run the function.

@@ -10,6 +10,40 @@
  */
 function tripal_genetic_enable() {
 
+  // Add cvterms needed for the feature map loader.
+  // map_type.
+  tripal_insert_cvterm(array(
+    'id' => 'local:map_type',
+    'name' => 'map_type',
+    'cv_name' => 'local',
+    'definition' => 'The type of feature map (e.g. genetic, cytogenetic, physical, sequence).',
+  ));
+
+  // published_map_name.
+  tripal_insert_cvterm(array(
+    'id' => 'local:published_map_name',
+    'name' => 'published_map_name',
+    'cv_name' => 'local',
+    'definition' => 'The name of the map in the linked publication.',
+  ));
+
+  // population_type.
+  tripal_insert_cvterm(array(
+    'id' => 'local:population_type',
+    'name' => 'population_type',
+    'cv_name' => 'local',
+    'definition' => 'The type of population used to generate a map (e.g. F2, BC1, RIL, ABC)',
+  ));
+
+  // population_size.
+  tripal_insert_cvterm(array(
+    'id' => 'local:population_size',
+    'name' => 'population_size',
+    'cv_name' => 'local',
+    'definition' => 'The number of individuals in the population used to generate the map.',
+  ));
+
+  // @todo File an issue with github/GMOD/chado to add this table to 1.4.
   $table = 'featuremap_analysis';
   $schema = [
     'table' => 'featuremap_analysis',

@@ -97,7 +97,7 @@ m9  5.009
       '#description' => 'A unique canonical name for the linkage map as defined by the curator.',
     ];
 
-    $form['pub_map_name'] = [
+    $form['published_map_name'] = [
       '#type' => 'textfield',
       '#title' => 'Published Map Name',
       '#description' => 'The name of the map as it was published.',
@@ -136,14 +136,14 @@ m9  5.009
     ];
 
     // Population Type (e.g. F2, BC1, RIL, ABC, etc.
-    $form['pop_type'] = [
+    $form['population_type'] = [
       '#type' => 'textfield',
       '#title' => 'Population Type',
       '#description' => 'The type of population used to generate the map (e.g. F2, BC1, RIL, ABC).',
     ];
 
     // Population Size.
-    $form['pop_size'] = [
+    $form['population_size'] = [
       '#type' => 'textfield',
       '#title' => 'Population Size',
       '#description' => 'The number of individuals in the population used to generate this map.',
@@ -258,9 +258,20 @@ m9  5.009
         'organism_id' => $args['organism_organism_id'],
       ]);
 
-      // chado_insert_property(
-      // ['table' => 'featuremap', 'id' => $featuremap->featuremap_id],
-      // );
+      // Create properties of the map.
+      $property_types = [
+        'map_type', 'published_map_name', 'population_size', 'population_type',
+      ];
+      foreach ($property_types as $type_name) {
+        chado_insert_property(
+          ['table' => 'featuremap', 'id' => $mapid],
+          [
+            'type_name' => $type_name,
+            'cv_name' => 'local',
+            'value' => $args[$type_name],
+          ]
+        );
+      }
 
     }
   }
