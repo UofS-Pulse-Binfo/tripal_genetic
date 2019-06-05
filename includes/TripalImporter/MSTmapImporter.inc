@@ -220,8 +220,20 @@ m9  5.009
 
     // Save map meta-data.
     $featuremap_id = $this->loadMapMetadata($arguments);
+    if (!$featuremap_id) {
+      $this->logMessage('An Error was encountered importing the map metadata.');
+    }
 
-    // @todo Save Map positions (file).
+    // Save Map positions (file).
+    $success = $this->loadMapFile($file_path, $featurempa_id, $arguments);
+
+    if ($success) {
+      $this->logMessage('The map was imported successfully.');
+    }
+    else {
+      $this->logMessage('An Error was encountered importing the map file.');
+    }
+    return $success;
   }
 
   /**
@@ -245,6 +257,10 @@ m9  5.009
         'programversion' => $args['analysis_programversion'],
         'description' => $args['analysis_description'],
       ]);
+      if (empty($analysis)) {
+        $this->logMessage('ERROR: Unable to insert analysis record.');
+        return FALSE;
+      }
 
       // Link the analysis to the map.
       chado_insert_record('featuremap_analysis', [
@@ -273,6 +289,79 @@ m9  5.009
         );
       }
 
+      return $mapid;
+    }
+    else {
+      $this->logMessage('ERROR: Unable to insert featuremap record.');
+      return FALSE;
+    }
+  }
+
+  /**
+   * Load the map file.
+   */
+  public function loadMapFile($file_path, $mapid, $args) {
+
+    // We want to provide a progress report to the end-user so that they:
+    // 1) Recognize that the loader is not hung if running a large file.
+    // 2) Provides some indicatation for how long the file will take to load.
+    //
+    // Here we'll get the size of the file and tell the TripalImporter how
+    // many "items" we have to process (in this case bytes of the file).
+    $filesize = filesize($file_path);
+    $this->setTotalItems($filesize);
+    $this->setItemsHandled(0);
+
+    // Loop through each line of file.  We use the fgets function so as not
+    // to load the entire file into memory but rather to iterate over each
+    // line separately.
+    $bytes_read = 0;
+    $in_fh = fopen($file_path, "r");
+    while ($line = fgets($in_fh)) {
+
+      // Calculate how many bytes we have read from the file and let the
+      // importer know how many have been processed so it can provide a
+      // progress indicator.
+      $bytes_read += drupal_strlen($line);
+      $this->setItemsHandled($bytes_read);
+
+      // Remove any trailing white-space from the line.
+      $line = trim($line);
+
+      // Skip empty lines.
+      if (empty($line)) {
+        continue;
+      }
+      // Skip Comments.
+      if ($line[0] == ';') {
+        continue;
+      }
+
+      // If we are looking at a new linkage group...
+      // If the line begins with `group`.
+      if (strpos($line, 'group') === 0) {
+        $linkage_group_name = trim(str_ireplace('group', '', $line));
+
+        // @todo insert the linkage group.
+
+      }
+      else {
+
+        // Split line on a tab into an array.
+        $cols = explode("\t", $line);
+        $locus_name = $col[0];
+        $marker_name = $locus_name;
+        $position = $col[1];
+
+        // @todo insert the locus.
+
+        // @todo look up the genetic marker.
+
+        // @todo link the locus and the genetic marker.
+
+        // @todo create the feature position.
+
+      }
     }
   }
 

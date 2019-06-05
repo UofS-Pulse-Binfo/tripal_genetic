@@ -80,6 +80,26 @@ class MstImporterTest extends TripalTestCase {
   }
 
   /**
+   * Test MSTmapImporter::loadMapFile().
+   *
+   * @dataProvider provideMapMetadata
+   */
+  public function testLoadMapFile($args) {
+    $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
+
+    // Run the function.
+    module_load_include('inc', 'tripal_genetic', 'includes/TripalImporter/MSTmapImporter');
+    $importer = new \MSTmapImporter();
+    $importer->create($run_args, $file);
+
+    $file_path = $file['file_local'];
+    $featuremap_id = factory('chado.featuremap')->create();
+    $success = $importer->loadMapFile($file_path, $featuremap_id, $args);
+
+    $this->assertNotFalse($success);
+  }
+
+  /**
    * Data Provider to test the loading functions.
    */
   public function provideMapMetadata() {

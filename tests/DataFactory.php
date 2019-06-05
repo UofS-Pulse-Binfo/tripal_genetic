@@ -194,3 +194,12 @@ Factory::define('chado.pub', function (Faker\Generator $faker) {
         'type_id' => factory('chado.cvterm')->create()->cvterm_id,
     ];
 });
+
+/** @see StatonLab\TripalTestSuite\Database\Factory::define() */
+Factory::define('chado.featuremap', function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->word,
+        'description' => $faker->text,
+        'unittype_id' => factory('chado.cvterm')->create()->cvterm_id,
+    ];
+});
