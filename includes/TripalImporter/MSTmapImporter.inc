@@ -225,7 +225,7 @@ m9  5.009
     }
 
     // Save Map positions (file).
-    $success = $this->loadMapFile($file_path, $featurempa_id, $arguments);
+    $success = $this->loadMapFile($file_path, $featuremap_id, $arguments);
 
     if ($success) {
       $this->logMessage('The map was imported successfully.');
@@ -342,25 +342,74 @@ m9  5.009
       if (strpos($line, 'group') === 0) {
         $linkage_group_name = trim(str_ireplace('group', '', $line));
 
-        // @todo insert the linkage group.
-
+        // Insert the linkage group.
+        $linkage_group = chado_insert_record('feature', [
+          'uniquename' => $linkage_group_name,
+          'name' => $linkage_group_name,
+          'organism_id' => $args['organism_organism_id'],
+          'type_id' => ['name' => 'linkage_group', 'cv_id' => ['name' => 'sequence']],
+        ]);
+        if (!empty($linkage_group)) {
+          $linkage_group_id = $linkage_group['feature_id'];
+        }
+        else {
+          $this->logMessage('Unable to insert linkage group, ' . $linkage_group_name);
+          return FALSE;
+        }
       }
       else {
 
         // Split line on a tab into an array.
         $cols = explode("\t", $line);
-        $locus_name = $col[0];
+        $locus_name = $cols[0];
         $marker_name = $locus_name;
-        $position = $col[1];
+        $position = $cols[1];
 
-        // @todo insert the locus.
+        // Insert the locus.
+        $values = [
+          'uniquename' => $locus_name,
+          'name' => $locus_name,
+          'organism_id' => $args['organism_organism_id'],
+          'type_id' => ['name' => 'locus', 'dbxref_id' => ['accession' => 'C45822']],
+        ];
+        $locus = chado_insert_record('feature', $values);
+        $locus_id = $locus['feature_id'];
 
-        // @todo look up the genetic marker.
+        // Look up the genetic marker.
+        $values = [
+          'uniquename' => $marker_name,
+          'name' => $marker_name,
+          'organism_id' => $args['organism_organism_id'],
+          'type_id' => ['name' => 'genetic_marker', 'cv_id' => ['name' => 'sequence']],
+        ];
+        $marker = chado_select_record('feature', ['*'], $values);
+        if (!$marker) {
+          $marker = chado_insert_record('feature', $values);
+        }
+        $marker_id = $marker['feature_id'];
 
-        // @todo link the locus and the genetic marker.
+        // Link the locus and the genetic marker.
+        $values = [
+          'subject_id' => $locus_id,
+          'type_id' => ['name' => 'instance_of'],
+          'object_id' => $marker_id,
+        ];
+        $fr = chado_select_record('feature_relationship', ['*'], $values);
+        if (!$fr) {
+          $fr = chado_insert_record('feature_relationship', $values);
+        }
 
-        // @todo create the feature position.
-
+        // Create the feature position.
+        $values = [
+          'featuremap_id' => $mapid,
+          'map_feature_id' => $linkage_group_id,
+          'feature_id' => $locus_id,
+          'mappos' => $position,
+        ];
+        $pos = chado_select_record('featurepos', ['*'], $values);
+        if (!$pos) {
+          $pos = chado_insert_record('featurepos', $values);
+        }
       }
     }
   }

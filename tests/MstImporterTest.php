@@ -93,10 +93,25 @@ class MstImporterTest extends TripalTestCase {
     $importer->create($run_args, $file);
 
     $file_path = $file['file_local'];
-    $featuremap_id = factory('chado.featuremap')->create();
+    $featuremap = factory('chado.featuremap')->create();
+    $featuremap_id = $featuremap->featuremap_id;
     $success = $importer->loadMapFile($file_path, $featuremap_id, $args);
 
     $this->assertNotFalse($success);
+
+    // There should be 1 linkage group (lg0).
+    $linkage_group_ids = chado_query("
+      SELECT map_feature_id FROM {featurepos} WHERE featuremap_id=:id GROUP BY map_feature_id
+    ", [':id' => $featuremap_id])->fetchCol();
+    $this->assertEquals(1, count($linkage_group_ids),
+      "There was not exactly one linkage group.");
+
+    // And 100 loci/positions.
+    $num_loci = chado_query("
+      SELECT count(feature_id) FROM {featurepos} WHERE featuremap_id=:id
+    ", [':id' => $featuremap_id])->fetchField();
+    $this->assertEquals(100, $num_loci,
+      "There was not exactly 100 loci/positions.");
   }
 
   /**

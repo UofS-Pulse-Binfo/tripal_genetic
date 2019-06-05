@@ -43,6 +43,22 @@ function tripal_genetic_enable() {
     'definition' => 'The number of individuals in the population used to generate the map.',
   ));
 
+  // locus.
+  tripal_insert_cvterm(array(
+    'id' => 'NCIT:C45822',
+    'name' => 'locus',
+    'cv_name' => 'ncit',
+    'definition' => 'The position of a gene or a chromosomal marker on a chromosome; also, a stretch of DNA at a particular place on a particular chromosome. The use of locus is sometimes restricted to mean regions of DNA that are expressed..',
+  ));
+
+  // instance_of.
+  tripal_insert_cvterm(array(
+    'id' => 'OBO_REL:instance_of',
+    'name' => 'instance_of',
+    'cv_name' => 'relationship',
+    'definition' => '',
+  ));
+
   // @todo File an issue with github/GMOD/chado to add this table to 1.4.
   $table = 'featuremap_analysis';
   $schema = [
