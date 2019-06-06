@@ -283,11 +283,21 @@ m9  5.009
           ['table' => 'featuremap', 'id' => $mapid],
           [
             'type_name' => $type_name,
-            'cv_name' => 'local',
+            'cv_name' => 'MAIN',
             'value' => $args[$type_name],
           ]
         );
       }
+
+      // Also insert the type as rdfs:type for Tripal Content type use.
+      chado_insert_property(
+        ['table' => 'featuremap', 'id' => $mapid],
+        [
+          'type_name' => 'type',
+          'cv_name' => 'rdfs',
+          'value' => $args['map_type'],
+        ]
+      );
 
       return $mapid;
     }
@@ -343,13 +353,15 @@ m9  5.009
         $linkage_group_name = trim(str_ireplace('group', '', $line));
 
         // Insert the linkage group.
-        $linkage_group = chado_insert_record('feature', [
+        $values = [
           'uniquename' => $linkage_group_name,
           'name' => $linkage_group_name,
           'organism_id' => $args['organism_organism_id'],
           'type_id' => ['name' => 'linkage_group', 'cv_id' => ['name' => 'sequence']],
-        ]);
-        if (!empty($linkage_group)) {
+        ];
+        $linkage_group = chado_select_record('feature', ['*'], $values);
+        if (empty($linkage_group)) {
+          $linkage_group = chado_insert_record('feature', $values);
           $linkage_group_id = $linkage_group['feature_id'];
         }
         else {
@@ -370,12 +382,19 @@ m9  5.009
           'uniquename' => $locus_name,
           'name' => $locus_name,
           'organism_id' => $args['organism_organism_id'],
-          'type_id' => ['name' => 'locus', 'dbxref_id' => ['accession' => 'C45822']],
+          'type_id' => ['name' => 'marker_locus', 'cv_id' => ['name' => 'MAIN']],
         ];
-        $locus = chado_insert_record('feature', $values);
-        $locus_id = $locus['feature_id'];
+        $locus = chado_select_record('feature', ['*'], $values);
+        if (!$locus) {
+          $locus = chado_insert_record('feature', $values);
+          $locus_id = $locus['feature_id'];
+        }
+        else {
+          $locus_id = $locus[0]['feature_id'];
+        }
 
         // Look up the genetic marker.
+        // @todo only allow select once we have a marker importer.
         $values = [
           'uniquename' => $marker_name,
           'name' => $marker_name,
@@ -399,7 +418,7 @@ m9  5.009
           $fr = chado_insert_record('feature_relationship', $values);
         }
 
-        // Create the feature position.
+        // Create the featurepos record.
         $values = [
           'featuremap_id' => $mapid,
           'map_feature_id' => $linkage_group_id,
@@ -409,7 +428,20 @@ m9  5.009
         $pos = chado_select_record('featurepos', ['*'], $values);
         if (!$pos) {
           $pos = chado_insert_record('featurepos', $values);
+          $pos_id = $pos['featurepos_id'];
         }
+
+        // Attach the position to the featurepos record.
+        $values = [
+          'featurepos_id' => $pos_id,
+          'type_id' => ['name' => 'start', 'cv_id' => ['name' => 'MAIN']],
+          'value' => $position,
+        ];
+        $posprop = chado_select_record('featureposprop', ['*'], $values);
+        if (!$posprop) {
+          $posprop = chado_insert_record('featureposprop', $values);
+        }
+
       }
     }
   }

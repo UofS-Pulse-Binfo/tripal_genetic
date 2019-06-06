@@ -13,42 +13,58 @@ function tripal_genetic_enable() {
   // Add cvterms needed for the feature map loader.
   // map_type.
   tripal_insert_cvterm(array(
-    'id' => 'local:map_type',
+    'id' => 'MAIN:map_type',
     'name' => 'map_type',
-    'cv_name' => 'local',
+    'cv_name' => 'MAIN',
     'definition' => 'The type of feature map (e.g. genetic, cytogenetic, physical, sequence).',
   ));
 
   // published_map_name.
   tripal_insert_cvterm(array(
-    'id' => 'local:published_map_name',
+    'id' => 'MAIN:published_map_name',
     'name' => 'published_map_name',
-    'cv_name' => 'local',
+    'cv_name' => 'MAIN',
     'definition' => 'The name of the map in the linked publication.',
   ));
 
   // population_type.
   tripal_insert_cvterm(array(
-    'id' => 'local:population_type',
+    'id' => 'MAIN:population_type',
     'name' => 'population_type',
-    'cv_name' => 'local',
+    'cv_name' => 'MAIN',
     'definition' => 'The type of population used to generate a map (e.g. F2, BC1, RIL, ABC)',
   ));
 
   // population_size.
   tripal_insert_cvterm(array(
-    'id' => 'local:population_size',
+    'id' => 'MAIN:population_size',
     'name' => 'population_size',
-    'cv_name' => 'local',
+    'cv_name' => 'MAIN',
     'definition' => 'The number of individuals in the population used to generate the map.',
   ));
 
   // locus.
   tripal_insert_cvterm(array(
-    'id' => 'NCIT:C45822',
-    'name' => 'locus',
-    'cv_name' => 'ncit',
+    'id' => 'MAIN:marker_locus',
+    'name' => 'marker_locus',
+    'cv_name' => 'MAIN',
     'definition' => 'The position of a gene or a chromosomal marker on a chromosome; also, a stretch of DNA at a particular place on a particular chromosome. The use of locus is sometimes restricted to mean regions of DNA that are expressed..',
+  ));
+
+  // start: used for marker positions.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:start',
+    'name' => 'start',
+    'cv_name' => 'MAIN',
+    'definition' => 'The start position.',
+  ));
+
+  // end: used for marker positions.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:end',
+    'name' => 'end',
+    'cv_name' => 'MAIN',
+    'definition' => 'The end position.',
   ));
 
   // instance_of.
@@ -56,6 +72,14 @@ function tripal_genetic_enable() {
     'id' => 'OBO_REL:instance_of',
     'name' => 'instance_of',
     'cv_name' => 'relationship',
+    'definition' => '',
+  ));
+
+  // marker_type.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:marker_type',
+    'name' => 'marker_type',
+    'cv_name' => 'MAIN',
     'definition' => '',
   ));
 
