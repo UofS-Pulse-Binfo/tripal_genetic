@@ -128,7 +128,7 @@ m9  5.009
       '#required' => TRUE,
       '#description' => 'The type of map.',
       '#options' => [
-        'linkage' => 'linkage',
+        'genetic' => 'genetic',
         'physical' => 'physical',
         'cytogenetic' => 'cytogenetic',
         'sequence' => 'sequence',
