@@ -407,6 +407,17 @@ m9  5.009
         }
         $marker_id = $marker['feature_id'];
 
+        // Also insert the marker type.
+        // @todo remove this in the future in favour of a marker importer.
+        chado_insert_property(
+          ['table' => 'feature', 'id' => $marker_id],
+          [
+            'type_name' => 'marker_type',
+            'cv_name' => 'MAIN',
+            'value' => 'SNP',
+          ]
+        );
+
         // Link the locus and the genetic marker.
         $values = [
           'subject_id' => $locus_id,
