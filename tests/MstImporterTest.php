@@ -135,6 +135,7 @@ class MstImporterTest extends TripalTestCase {
         'population_size' => $faker->randomDigitNotNull(),
         'analysis_program' => $faker->name,
         'analysis_programversion' => $faker->randomFloat(2, 1, 5),
+        'analysis_sourcename' => $faker->words(8, TRUE),
         'analysis_description' => $faker->sentences(2, TRUE),
         'featuremap_description' => $faker->paragraphs(5, TRUE),
       ],
@@ -147,6 +148,7 @@ class MstImporterTest extends TripalTestCase {
         'organism_organism_id' => $organism->organism_id,
         'analysis_program' => $faker->name,
         'analysis_programversion' => $faker->randomFloat(2, 1, 5),
+        'analysis_sourcename' => $faker->words(5, TRUE),
         'map_type' => $faker->name,
         'featuremap_unittype_name' => 'cM',
       ],
@@ -180,7 +182,7 @@ class MstImporterTest extends TripalTestCase {
     // Tripal Map Required: featuremap.name, featuremapprop.value (map_type),
     // featuremap.unittype_id.
     $required = [
-      'organism_organism_id', 'analysis_program', 'analysis_programversion',
+      'organism_organism_id', 'analysis_program', 'analysis_programversion', 'analysis_sourcename',
       'featuremap_name', 'map_type', 'featuremap_unittype_name',
     ];
     foreach ($form as $key => $element) {

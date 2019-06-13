@@ -177,6 +177,14 @@ m9  5.009
       '#description' => 'The version of the above mapping software which was used.',
     ];
 
+    // Analysis sourcename.
+    $form['analysis_sourcename'] = [
+      '#type' => 'textfield',
+      '#title' => 'Data Source',
+      '#required' => TRUE,
+      '#description' => 'A unique name for the data you used to generate this map (e.g. "RIL### Exome Capture Jun 2019").',
+    ];
+
     // Analysis Description.
     $form['analysis_description'] = [
       '#type' => 'textarea',
@@ -255,6 +263,7 @@ m9  5.009
         'name' => 'Generate ' . $args['featuremap_name'],
         'program' => $args['analysis_program'],
         'programversion' => $args['analysis_programversion'],
+        'sourcename' => $args['analysis_sourcename'],
         'description' => $args['analysis_description'],
       ]);
       if (empty($analysis)) {
