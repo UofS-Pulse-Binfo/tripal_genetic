@@ -23,12 +23,11 @@ before_script:
   - composer global require dealerdirect/phpcodesniffer-composer-installer
 
 script:
-  - docker run -it -d --rm --name tripal -v "$(pwd)":/modules/tripal_genetic statonlab/tripal3
+  - docker run -it -d --rm --name tripal -v "$(pwd)":/modules/tripal_map_helper statonlab/tripal3
   - sleep 30 # We pause here so postgres and apache complete booting up
   - docker exec -it tripal drush pm-enable -y tripal_genetic
   - docker exec -it tripal yum install -y php-pecl-xdebug.x86_64
-  - docker exec -it tripal bash -c "cd /modules/tripal_genetic && composer install && DRUPAL_ROOT=/var/www/html IS_TRAVIS=TRUE ./vendor/bin/phpunit --coverage-clover ./clover.xml"
+  - docker exec -it tripal bash -c "cd /modules/tripal_map_helper && composer install && DRUPAL_ROOT=/var/www/html IS_TRAVIS=TRUE ./vendor/bin/phpunit --coverage-clover ./clover.xml"
 
 after_script:
-  - ./cc-test-reporter after-build clover.xml --debug -t clover -p /var/www/html/sites/all/modules/custom/tripal_genetic --exit-code $TRAVIS_TEST_RESULT
-
+  - ./cc-test-reporter after-build clover.xml --debug -t clover -p /var/www/html/sites/all/modules/custom/tripal_map_helper --exit-code $TRAVIS_TEST_RESULT
