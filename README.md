@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/UofS-Pulse-Binfo/tripal-map-helper.svg?branch=master)](https://travis-ci.org/UofS-Pulse-Binfo/tripal_map_helper)
+[![Build Status](https://travis-ci.org/UofS-Pulse-Binfo/tripal_map_helper.svg?branch=master)](https://travis-ci.org/UofS-Pulse-Binfo/tripal_map_helper)
 [![Documentation Status](https://readthedocs.org/projects/tripal-map-helper/badge/?version=latest)](https://tripal-map-helper.readthedocs.io/en/latest/?badge=latest)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/db8bad906e18da15382e/test_coverage)](https://codeclimate.com/github/UofS-Pulse-Binfo/tripal_map_helper/test_coverage)
 
