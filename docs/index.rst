@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Tripal Genetic: Available Documentation
+Tripal Map Helper: Available Documentation
 ==========================================
+
+The goal of this module is to provide helper functionality for WSU Tripal Map. Specifically, it inserts cvterm and provides data loaders.
 
 .. toctree::
    :maxdepth: 2
