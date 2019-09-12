@@ -8,7 +8,7 @@
 /**
  * Implements hook_enable().
  */
-function tripal_genetic_enable() {
+function tripal_map_helper_enable() {
 
   // Add cvterms needed for the feature map loader.
   // map_type.
