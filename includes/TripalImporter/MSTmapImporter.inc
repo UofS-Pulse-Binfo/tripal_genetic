@@ -227,12 +227,14 @@ m9  5.009
     $file_path = $this->arguments['files'][0]['file_path'];
 
     // Save map meta-data.
+    print "\nSaving metadata...\n";
     $featuremap_id = $this->loadMapMetadata($arguments);
     if (!$featuremap_id) {
       $this->logMessage('An Error was encountered importing the map metadata.');
     }
 
     // Save Map positions (file).
+    print "\nSaving map locations...\n";
     $success = $this->loadMapFile($file_path, $featuremap_id, $arguments);
 
     if ($success) {
@@ -248,6 +250,7 @@ m9  5.009
    * Creater featuremap and featuremapprop records.
    */
   public function loadMapMetadata($args) {
+    $debug = FALSE;
 
     $feature_map = chado_insert_record('featuremap', [
       'name' => $args['featuremap_name'],
@@ -257,6 +260,7 @@ m9  5.009
 
     if (!empty($feature_map)) {
       $mapid = $feature_map['featuremap_id'];
+      if ($debug) { print "\tCreated map record (ID=$mapid).\n"; }
 
       // Create Analysis.
       $analysis = chado_insert_record('analysis', [
@@ -270,6 +274,7 @@ m9  5.009
         $this->logMessage('ERROR: Unable to insert analysis record.');
         return FALSE;
       }
+      if ($debug) { print "\tCreated analysis (ID=".$analysis['analysis_id'].").\n"; }
 
       // Link the analysis to the map.
       chado_insert_record('featuremap_analysis', [
@@ -320,6 +325,7 @@ m9  5.009
    * Load the map file.
    */
   public function loadMapFile($file_path, $mapid, $args) {
+    $debug = FALSE;
 
     // We want to provide a progress report to the end-user so that they:
     // 1) Recognize that the loader is not hung if running a large file.
@@ -360,6 +366,7 @@ m9  5.009
       // If the line begins with `group`.
       if (strpos($line, 'group') === 0) {
         $linkage_group_name = trim(str_ireplace('group', '', $line));
+        if ($debug) { print "\tCreating LG '$linkage_group_name'.\n";}
 
         // Insert the linkage group.
         $values = [
@@ -374,8 +381,7 @@ m9  5.009
           $linkage_group_id = $linkage_group['feature_id'];
         }
         else {
-          $this->logMessage('Unable to insert linkage group, ' . $linkage_group_name);
-          return FALSE;
+          $linkage_group_id = $linkage_group[0]->feature_id;
         }
       }
       else {
@@ -399,8 +405,9 @@ m9  5.009
           $locus_id = $locus['feature_id'];
         }
         else {
-          $locus_id = $locus[0]['feature_id'];
+          $locus_id = $locus[0]->feature_id;
         }
+        if ($debug) { print "\tCreated LOCUS '$locus_id'.\n";}
 
         // Look up the genetic marker.
         // @todo only allow select once we have a marker importer.
@@ -413,8 +420,12 @@ m9  5.009
         $marker = chado_select_record('feature', ['*'], $values);
         if (!$marker) {
           $marker = chado_insert_record('feature', $values);
+          $marker_id = $marker['feature_id'];
         }
-        $marker_id = $marker['feature_id'];
+        else {
+          $marker_id = $marker[0]->feature_id;
+        }
+        if ($debug) { print "\tCreated Marker '$marker_id'.\n";}
 
         // Also insert the marker type.
         // @todo remove this in the future in favour of a marker importer.
@@ -450,6 +461,7 @@ m9  5.009
           $pos = chado_insert_record('featurepos', $values);
           $pos_id = $pos['featurepos_id'];
         }
+        if ($debug) { print "\tCreated Position '$pos_id'.\n";}
 
         // Attach the position to the featurepos record.
         $values = [
@@ -464,6 +476,8 @@ m9  5.009
 
       }
     }
+
+    return TRUE;
   }
 
 }
