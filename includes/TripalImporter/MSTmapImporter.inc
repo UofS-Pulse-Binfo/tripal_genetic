@@ -325,7 +325,7 @@ m9  5.009
    * Load the map file.
    */
   public function loadMapFile($file_path, $mapid, $args) {
-    $debug = FALSE;
+    $debug = TRUE;
 
     // We want to provide a progress report to the end-user so that they:
     // 1) Recognize that the loader is not hung if running a large file.
@@ -370,7 +370,7 @@ m9  5.009
 
         // Insert the linkage group.
         $values = [
-          'uniquename' => $linkage_group_name,
+          'uniquename' => $linkage_group_name . ' from map' . $mapid,
           'name' => $linkage_group_name,
           'organism_id' => $args['organism_organism_id'],
           'type_id' => ['name' => 'linkage_group', 'cv_id' => ['name' => 'sequence']],
