@@ -250,7 +250,7 @@ m9  5.009
    * Creater featuremap and featuremapprop records.
    */
   public function loadMapMetadata($args) {
-    $debug = FALSE;
+    $debug = TRUE;
 
     $feature_map = chado_insert_record('featuremap', [
       'name' => $args['featuremap_name'],
@@ -412,13 +412,13 @@ m9  5.009
         // Look up the genetic marker.
         // @todo only allow select once we have a marker importer.
         $values = [
-          'uniquename' => $marker_name,
           'name' => $marker_name,
           'organism_id' => $args['organism_organism_id'],
           'type_id' => ['name' => 'genetic_marker', 'cv_id' => ['name' => 'sequence']],
         ];
         $marker = chado_select_record('feature', ['*'], $values);
         if (!$marker) {
+          $values['uniquename'] = $marker_name;
           $marker = chado_insert_record('feature', $values);
           $marker_id = $marker['feature_id'];
         }
