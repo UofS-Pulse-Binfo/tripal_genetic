@@ -1,5 +1,6 @@
 ![Tripal Dependency](https://img.shields.io/badge/tripal-%3E=3.0-brightgreen)
 ![Module is Generic](https://img.shields.io/badge/generic-tested%20manually-yellow)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/UofS-Pulse-Binfo/tripal_map_helper?include_prereleases)
 
 [![Build Status](https://travis-ci.org/UofS-Pulse-Binfo/tripal_map_helper.svg?branch=master)](https://travis-ci.org/UofS-Pulse-Binfo/tripal_map_helper)
 [![Maintainability](https://api.codeclimate.com/v1/badges/db8bad906e18da15382e/maintainability)](https://codeclimate.com/github/UofS-Pulse-Binfo/tripal_genetic/maintainability)
