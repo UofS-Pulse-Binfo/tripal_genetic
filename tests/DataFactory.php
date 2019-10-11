@@ -71,7 +71,7 @@ Factory::define('chado.organism', function (Faker\Generator $faker) {
 Factory::define('chado.feature', function (Faker\Generator $faker) {
     return [
         'name' => $faker->word,
-        'uniquename' => $faker->unique()->word,
+        'uniquename' => $faker->unique()->word . uniqid(),
         'organism_id' => factory('chado.organism')->create()->organism_id,
         'type_id' => factory('chado.cvterm')->create()->cvterm_id,
     ];

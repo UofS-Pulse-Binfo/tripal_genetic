@@ -55,6 +55,7 @@ class QTLImporter extends TripalImporter {
     <li><strong>Trait Abbreviation</strong>: A short 2-5 letter abbreviation of the trait (e.g. DTF).</li>
     <li><strong>Environments (SiteYears)</strong>: The environments a QTL is significant in (e.g. Preston 2009).</li>
     <li><strong>Peak Marker</strong>: The genetic marker closest to the peak LOD of the QTL.</li>
+    <li><strong>Linkage Group</strong>: The linkage group the QTL is located on.</li>
     <li><strong>Peak Position</strong>: The cM position of the peak LOD for the QTL.</li>
     <li><strong>Peak LOD</strong>: The highest LOD score on the QTL graph. </li>
     <li><strong>Phenotypic r2</strong>: Phenotypic variance explained by the QTL (expressed as a fraction).</li>
@@ -108,6 +109,16 @@ class QTLImporter extends TripalImporter {
       '#weight' => -100
     ];
 
+    $options = chado_query('SELECT cv_id, name  FROM {cv} ORDER BY name ASC')->fetchAllKeyed(0,1);
+    $form['trait_cv_id'] = [
+      '#type' => 'select',
+      '#title' => 'Trait Vocabulary',
+      '#options' => $options,
+      '#empty_option' => ' - Select Vocab -',
+      '#description' => 'All traits associated within your file are expected to already exist. Specifically, the "Trait Full Name" must match exactly and the be in the selected vocabulary.',
+      '#weight' => -90
+    ];
+
     return $form;
   }
 
@@ -124,7 +135,7 @@ class QTLImporter extends TripalImporter {
     // All values provided by the user in the Importer's form widgets are
     // made available to us here by the Class' arguments member variable.
     $arguments = $this->arguments['run_args'];
-    print "Arguements supplied include:\n";
+    print "\nArguments supplied include:\n";
     foreach ($arguments as $k => $v) {
       print "\t-$k: $v\n";
     }
@@ -135,15 +146,228 @@ class QTLImporter extends TripalImporter {
     // where the file is located on the server.
     $file_path = $this->arguments['files'][0]['file_path'];
 
-    $success = FALSE;
+    // Retrieve map to add QTL Data to.
+    $featuremap_id = $arguments['featuremap_name'];
+    if (!$featuremap_id) {
+      $this->logMessage('An Error was encountered retrieving the genetic map.');
+      return FALSE;
+    }
+
+    // Retrieve map to add QTL Data to.
+    $trait_cv_id = $arguments['trait_cv_id'];
+    if (!$trait_cv_id) {
+      $this->logMessage('An Error was encountered retrieving the trait cv.');
+      return FALSE;
+    }
+
+    // Next, add the QTLs.
+    $success = $this->importQTLsfromFile($file_path, $featuremap_id, $trait_cv_id);
+
+    //Finally, report completion to the user.
     if ($success) {
       $this->logMessage('The map was imported successfully.');
     }
     else {
-      $this->logMessage('An Error was encountered importing the map file.');
+      $this->logMessage('An Error was encountered importing the QTL data file.');
     }
     return $success;
   }
 
+  /**
+   * Import the QTL into the database.
+   *
+   * @param $file_path
+   *   The file containing QTLs to be imported.
+   * @param $feature_map_id
+   *   The ID of the genetic map the QTL are from.
+   * @return
+   *   TRUE or BALSE depending on successful import.
+   */
+  public function importQTLsfromFile($file_path, $feature_map_id, $trait_cv_id) {
+    $debug = FALSE;
 
+    // We want to provide a progress report to the end-user so that they:
+    // 1) Recognize that the loader is not hung if running a large file.
+    // 2) Provides some indicatation for how long the file will take to load.
+    //
+    // Here we'll get the size of the file and tell the TripalImporter how
+    // many "items" we have to process (in this case bytes of the file).
+    $filesize = filesize($file_path);
+    $this->setTotalItems($filesize);
+    $this->setItemsHandled(0);
+
+
+    // Loop through each line of file.  We use the fgets function so as not
+    // to load the entire file into memory but rather to iterate over each
+    // line separately.
+    $bytes_read = 0;
+    $in_fh = fopen($file_path, "r");
+
+    // Remove header.
+    $line = fgets($in_fh);
+
+    // Now process each data containing line.
+    while ($line = fgets($in_fh)) {
+
+      // Calculate how many bytes we have read from the file and let the
+      // importer know how many have been processed so it can provide a
+      // progress indicator.
+      $bytes_read += drupal_strlen($line);
+      $this->setItemsHandled($bytes_read);
+
+      // Skip empty lines.
+      if (empty(trim($line))) {
+        continue;
+      }
+      // Skip Comments.
+      if ($line[0] == ';') {
+        continue;
+      }
+
+      // Remove any trailing white-space from the line.
+      $line = explode("\t", $line);
+      print_r($line);
+
+      // Lookup Linkage group. Must already exist.
+      $linkage_group = [
+        'name' => $line[6],
+        'type_id' => ['name' => 'linkage_group'],
+      ];
+      $linkage_group_id = $this->lookup_id('feature',$linkage_group, 'feature_id');
+      if (!$linkage_group_id) {
+        print "\n".'Error: Unable to lookup existing linkage group "'.$line[6].'".';
+        $this->logMessage('Error: Unable to lookup existing linkage group "'.$line[6].'".');
+        return FALSE;
+      }
+
+      // Look up the organism based on the linkage group.
+      $organism_id = chado_query('SELECT organism_id FROM {feature} WHERE feature_id=:id',
+        [':id' => $linkage_group_id])->fetchField();
+
+
+      // Create QTL.
+      $QTL = [
+        'name' => $line[0],
+        'uniquename' => $line[1],
+        'organism_id' => $organism_id,
+        'type_id' => ['name' => 'QTL', 'cv_id' => ['name' => 'sequence']],
+      ];
+      $QTL_id = $this->save_datapoint('feature', $QTL, 'feature_id');
+
+      // Add Metadata as properties of the QTL.
+      // -- Trait Abbreviation.
+      $this->save_feature_property($QTL_id, 'MAIN', 'published_symbol', $line[3]);
+      // -- Environment.
+      $this->save_feature_property($QTL_id, 'MAIN', 'site_name', $line[4]);
+      // -- Peak LOD.
+      $this->save_feature_property($QTL_id, 'MAIN', 'lod', $line[8]);
+      // -- r2.
+      $this->save_feature_property($QTL_id, 'MAIN', 'r2', $line[9]);
+      // -- Additive Effect.
+      $this->save_feature_property($QTL_id, 'MAIN', 'additive_effect', $line[10]);
+      // -- Contributor Parent.
+      $this->save_feature_property($QTL_id, 'MAIN', 'direction', $line[11]);
+
+      // Associate Peak Marker. (relationship:located_in)
+      // @todo
+      //$this->save_feature_property($QTL_id, 'MAIN', '', $line[5]);
+
+      // Lookup Trait.
+      $trait = [
+        'name' => $line[2],
+        'cv_id' => $trait_cv_id,
+      ];
+      $trait_id = $this->lookup_id('cvterm',$trait, 'cvterm_id');
+      if (!$trait_id) {
+        $message = 'Error: Unable to lookup existing trait "'.$line[2].'".';
+        print "\n$message.";
+        $this->logMessage($message);
+        return FALSE;
+      }
+
+      // -- Link to Trait.
+      $trait_link = [
+        'feature_id' => $QTL_id,
+        'cvterm_id' => $trait_id,
+        'pub_id' => 1,
+      ];
+      $this->save_datapoint('feature_cvterm', $trait_link, 'feature_cvterm_id');
+
+      // Add the positions.
+      // -- Peak Position.
+      $pos = [
+        'featuremap_id' => $feature_map_id,
+        'map_feature_id' => $linkage_group_id,
+        'feature_id' => $QTL_id,
+        'mappos' => $line[7],
+      ];
+      $featurepos_id = $this->save_datapoint('featurepos', $pos, 'featurepos_id');
+      $this->save_feature_property($featurepos_id, 'MAIN', 'qtl_peak', $line[7], $table = 'featurepos');
+
+      // -- CI 1 LOD drop.
+      if ($line[13]) {
+        $this->save_feature_property($featurepos_id, 'MAIN', 'start', $line[12], $table = 'featurepos');
+        $this->save_feature_property($featurepos_id, 'MAIN', 'end', $line[13], $table = 'featurepos');
+      }
+
+      // -- CI 2 LOD drop: start.
+      // -- CI 2 LOD drop: end.
+      // @todo
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * HELPER: Insert-Update feature properties!
+   */
+  public function save_feature_property($id, $cv_name, $cvterm_name, $value, $table = 'feature') {
+
+    $record_values = [
+      'table' => $table,
+      'id' => $id,
+    ];
+    $property_values = [
+      'cv_name' => $cv_name,
+      'type_name' => $cvterm_name,
+      'value' => $value,
+    ];
+    $property = chado_get_property($record_values, $property_values);
+
+    // Insert it if it doesn't already exist.
+    if (!$property) {
+      return chado_insert_property($record_values, $property_values);
+    }
+    else {
+      return chado_update_property($record_values, $property_values);
+    }
+  }
+
+  /**
+   * HELPER: Provides lookup functionality for this importer.
+   */
+  public function lookup_id($chado_table, $values, $id_column) {
+    $record = chado_select_record($chado_table, ['*'], $values);
+    if ($record) {
+      return $record[0]->{$id_column};
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * HELPER: Provides Insert or Update functionality for this importer.
+   */
+  public function save_datapoint($chado_table, $values, $id_column) {
+
+    $record = chado_select_record($chado_table, ['*'], $values);
+    if (empty($record)) {
+      $record = chado_insert_record($chado_table, $values);
+      return $record[$id_column];
+    }
+    else {
+      return $record[0]->{$id_column};
+    }
+  }
 }

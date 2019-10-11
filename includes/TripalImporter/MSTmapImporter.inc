@@ -325,7 +325,7 @@ m9  5.009
    * Load the map file.
    */
   public function loadMapFile($file_path, $mapid, $args) {
-    $debug = TRUE;
+    $debug = FALSE;
 
     // We want to provide a progress report to the end-user so that they:
     // 1) Recognize that the loader is not hung if running a large file.

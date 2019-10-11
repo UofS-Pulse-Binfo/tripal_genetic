@@ -83,6 +83,63 @@ function tripal_map_helper_enable() {
     'definition' => '',
   ));
 
+  // CVterms needed for QTL.
+  // published_symbol.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:published_symbol',
+    'name' => 'published_symbol',
+    'cv_name' => 'MAIN',
+    'definition' => '',
+  ));
+
+  // site_name.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:site_name',
+    'name' => 'site_name',
+    'cv_name' => 'MAIN',
+    'definition' => '',
+  ));
+
+  // lod.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:lod',
+    'name' => 'lod',
+    'cv_name' => 'MAIN',
+    'definition' => '',
+  ));
+
+  // r2.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:r2',
+    'name' => 'r2',
+    'cv_name' => 'MAIN',
+    'definition' => '',
+  ));
+
+  // additive_effect.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:additive_effect',
+    'name' => 'additive_effect',
+    'cv_name' => 'MAIN',
+    'definition' => '',
+  ));
+
+  // direction.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:direction',
+    'name' => 'direction',
+    'cv_name' => 'MAIN',
+    'definition' => '',
+  ));
+
+  // qtl_peak.
+  tripal_insert_cvterm(array(
+    'id' => 'MAIN:qtl_peak',
+    'name' => 'qtl_peak',
+    'cv_name' => 'MAIN',
+    'definition' => '',
+  ));
+  
   // @todo File an issue with github/GMOD/chado to add this table to 1.4.
   $table = 'featuremap_analysis';
   $schema = [
