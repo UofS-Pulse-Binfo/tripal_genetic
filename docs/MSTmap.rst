@@ -2,6 +2,9 @@
 MSTmap Importer
 ================
 
+Format
+--------
+
 This importer will load genetic maps which follow the same format output by the `MSTmap software <http://www.mstmap.org/>`_. This format consists of a TSV file listing the positions of markers in a genetic map. Each linkage group is labelled with it's name followed by a 2-column format: marker name, marker position (centimorgans). For example,
 
 .. code::
@@ -24,9 +27,7 @@ The importer also stores metadata about the map through a well described form:
 Validation
 ------------
 
-.. warning::
-
-  This is an outstanding todo item.
+There is currently no validation of the file on import. However, the metadata in the form is minimally validated (e.g. the organism must already exist in order to be chosen).
 
 Data Storage
 -------------

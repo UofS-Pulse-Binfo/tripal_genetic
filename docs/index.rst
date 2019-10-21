@@ -14,3 +14,4 @@ The goal of this module is to provide helper functionality for WSU Tripal Map. S
 
    install
    MSTmap
+   QTLimporter
