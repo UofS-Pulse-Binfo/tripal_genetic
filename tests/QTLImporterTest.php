@@ -38,6 +38,31 @@ class QTLImporterTest extends TripalTestCase {
     $this->assertNotFalse($success,
       "The importer returned an error.");
 
+    // Finally, check that the data is in the correct tables, etc.
+    // -- check that the QTL features were created.
+    $qtl = chado_query("SELECT * FROM {feature} f
+      WHERE f.type_id IN (SELECT cvterm_id FROM {cvterm} WHERE name='QTL')
+      AND f.organism_id=:org", [':org' => $mapdetails['organism_id']])->fetchAll();
+    $this->assertCount(4, $qtl, "There was not the expected number of QTL inserted.");
+
+    // -- check the published names match.
+    $names = ['LcC23363p108-DTF-SPG2011', 'LcC06044p758-DTF-Preston2009',
+      'Yc-DTF-Preston2011', 'Yc-DTF-Preston2009'];
+    $qtl_ids = [];
+    foreach ($qtl as $q) {
+      $this->assertContains($q->name, $names,
+        "The QTL retrieved is not one of the names we expected.");
+      $qtl_ids[] = $q->feature_id;
+    }
+
+    // -- check that each QTL is positioned on the map.
+    $positions = chado_query('SELECT * FROM chado.featurepos WHERE feature_id IN (:ids)',
+      [':ids' => $qtl_ids])->fetchAll();
+    $this->assertCount(4, $positions, "There was not the expected number of locations for our set of QTL.");
+    foreach ($positions as $pos) {
+      $this->assertEquals($mapdetails['featuremap_id'], $pos->featuremap_id,
+        "We have a position for the QTL but it is not on our map.");
+    }
   }
 
   /**
