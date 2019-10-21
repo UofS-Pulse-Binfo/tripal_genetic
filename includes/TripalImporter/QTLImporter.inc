@@ -196,7 +196,6 @@ class QTLImporter extends TripalImporter {
     $this->setTotalItems($filesize);
     $this->setItemsHandled(0);
 
-
     // Loop through each line of file.  We use the fgets function so as not
     // to load the entire file into memory but rather to iterate over each
     // line separately.
@@ -225,18 +224,36 @@ class QTLImporter extends TripalImporter {
       }
 
       // Remove any trailing white-space from the line.
-      $line = explode("\t", $line);
-      print_r($line);
+      $linetmp = explode("\t", $line);
+      // Make an associative array for more readable code.
+      $line = [
+        'published_symbol' => trim($linetmp[0]),
+        'trait_name' => trim($linetmp[1]),
+        'trait_symbol' => trim($linetmp[2]),
+        'siteyear' => trim($linetmp[3]),
+        'peak_marker' => trim($linetmp[4]),
+        'linkage_group' => trim($linetmp[5]),
+        'peak_pos' => trim($linetmp[6]),
+        'peak_lod' => trim($linetmp[7]),
+        'r2' => trim($linetmp[8]),
+        'addt_effect' => trim($linetmp[9]),
+        'addt_parent' => trim($linetmp[10]),
+        'CIstart' => trim($linetmp[11]),
+        'CIend' => trim($linetmp[12]),
+        'CIlod2start' => trim($linetmp[13]),
+        'CIlod2end' => trim($linetmp[14]),
+      ];
+      // @debug print_r($line);
 
       // Lookup Linkage group. Must already exist.
       $linkage_group = [
-        'name' => $line[6],
+        'name' => $line['linkage_group'],
         'type_id' => ['name' => 'linkage_group'],
       ];
       $linkage_group_id = $this->lookup_id('feature',$linkage_group, 'feature_id');
       if (!$linkage_group_id) {
-        print "\n".'Error: Unable to lookup existing linkage group "'.$line[6].'".';
-        $this->logMessage('Error: Unable to lookup existing linkage group "'.$line[6].'".');
+        print "\n".'Error: Unable to lookup existing linkage group "'.$line['linkage_group'].'".';
+        $this->logMessage('Error: Unable to lookup existing linkage group "'.$line['linkage_group'].'".');
         return FALSE;
       }
 
@@ -245,10 +262,19 @@ class QTLImporter extends TripalImporter {
         [':id' => $linkage_group_id])->fetchField();
 
 
+      // Generate uniquename for QTL.
+      // Tripal map assumes a non-important leading character (e.g. q)
+      // then displays everything to the first period. We want to display
+      // the trait symbol.
+      // q[trait symbol].[linkage group]-[peak position].map[map ID].[siteyear]
+      $qtl_dbname = 'q' . $line['trait_symbol'] . '.'
+        . $line['linkage_group'] . '-' . $line['peak_pos']
+        . '.map' . $feature_map_id . '.' . $line['siteyear'];
+
       // Create QTL.
       $QTL = [
-        'name' => $line[0],
-        'uniquename' => $line[1],
+        'name' => $line['published_symbol'],
+        'uniquename' => $qtl_dbname,
         'organism_id' => $organism_id,
         'type_id' => ['name' => 'QTL', 'cv_id' => ['name' => 'sequence']],
       ];
@@ -256,30 +282,29 @@ class QTLImporter extends TripalImporter {
 
       // Add Metadata as properties of the QTL.
       // -- Trait Abbreviation.
-      $this->save_feature_property($QTL_id, 'MAIN', 'published_symbol', $line[3]);
+      $this->save_feature_property($QTL_id, 'MAIN', 'published_symbol', $line['trait_symbol']);
       // -- Environment.
-      $this->save_feature_property($QTL_id, 'MAIN', 'site_name', $line[4]);
+      $this->save_feature_property($QTL_id, 'MAIN', 'site_name', $line['siteyear']);
       // -- Peak LOD.
-      $this->save_feature_property($QTL_id, 'MAIN', 'lod', $line[8]);
+      $this->save_feature_property($QTL_id, 'MAIN', 'lod', $line['peak_lod']);
       // -- r2.
-      $this->save_feature_property($QTL_id, 'MAIN', 'r2', $line[9]);
+      $this->save_feature_property($QTL_id, 'MAIN', 'r2', $line['r2']);
       // -- Additive Effect.
-      $this->save_feature_property($QTL_id, 'MAIN', 'additive_effect', $line[10]);
+      $this->save_feature_property($QTL_id, 'MAIN', 'additive_effect', $line['addt_effect']);
       // -- Contributor Parent.
-      $this->save_feature_property($QTL_id, 'MAIN', 'direction', $line[11]);
+      $this->save_feature_property($QTL_id, 'MAIN', 'direction', $line['addt_parent']);
 
-      // Associate Peak Marker. (relationship:located_in)
-      // @todo
-      //$this->save_feature_property($QTL_id, 'MAIN', '', $line[5]);
+      // Associate Peak Marker.
+      $this->save_feature_property($QTL_id, 'MAIN', 'marker_locus', $line['peak_marker']);
 
       // Lookup Trait.
       $trait = [
-        'name' => $line[2],
+        'name' => $line['trait_name'],
         'cv_id' => $trait_cv_id,
       ];
       $trait_id = $this->lookup_id('cvterm',$trait, 'cvterm_id');
       if (!$trait_id) {
-        $message = 'Error: Unable to lookup existing trait "'.$line[2].'".';
+        $message = 'Error: Unable to lookup existing trait "'.$line['trait_name'].'".';
         print "\n$message.";
         $this->logMessage($message);
         return FALSE;
@@ -299,15 +324,15 @@ class QTLImporter extends TripalImporter {
         'featuremap_id' => $feature_map_id,
         'map_feature_id' => $linkage_group_id,
         'feature_id' => $QTL_id,
-        'mappos' => $line[7],
+        'mappos' => $line['peak_pos'],
       ];
       $featurepos_id = $this->save_datapoint('featurepos', $pos, 'featurepos_id');
-      $this->save_feature_property($featurepos_id, 'MAIN', 'qtl_peak', $line[7], $table = 'featurepos');
+      $this->save_feature_property($featurepos_id, 'MAIN', 'qtl_peak', $line['peak_pos'], $table = 'featurepos');
 
       // -- CI 1 LOD drop.
-      if ($line[13]) {
-        $this->save_feature_property($featurepos_id, 'MAIN', 'start', $line[12], $table = 'featurepos');
-        $this->save_feature_property($featurepos_id, 'MAIN', 'end', $line[13], $table = 'featurepos');
+      if ($line['CIstart']) {
+        $this->save_feature_property($featurepos_id, 'MAIN', 'start', $line['CIstart'], $table = 'featurepos');
+        $this->save_feature_property($featurepos_id, 'MAIN', 'end', $line['CIend'], $table = 'featurepos');
       }
 
       // -- CI 2 LOD drop: start.

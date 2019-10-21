@@ -37,6 +37,7 @@ class QTLImporterTest extends TripalTestCase {
     $success = $importer->run();
     $this->assertNotFalse($success,
       "The importer returned an error.");
+
   }
 
   /**

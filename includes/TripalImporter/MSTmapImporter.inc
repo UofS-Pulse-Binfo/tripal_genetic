@@ -250,7 +250,7 @@ m9  5.009
    * Creater featuremap and featuremapprop records.
    */
   public function loadMapMetadata($args) {
-    $debug = TRUE;
+    $debug = FALSE;
 
     $feature_map = chado_insert_record('featuremap', [
       'name' => $args['featuremap_name'],
