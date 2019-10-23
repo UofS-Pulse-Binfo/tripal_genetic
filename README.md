@@ -25,8 +25,8 @@ This module provides additional fields and data import which complement Tripal M
 ## Importers
  - [Genetic Maps (MSTmap Format)](https://tripal-map-helper.readthedocs.io/en/latest/MSTmap.html)
  - Genetic Markers & Loci: COMING SOON
- - Quantitative Trait Loci (QTL): COMING SOON
- 
+ - [Quantitative Trait Loci (QTL)](https://tripal-map-helper.readthedocs.io/en/latest/QTLimporter.html)
+
 ## Documentation [![Documentation Status](https://readthedocs.org/projects/tripal-map-helper/badge/?version=latest)](https://tripal-map-helper.readthedocs.io/en/latest/?badge=latest)
 
 We have extensive documentation for all our available importers including form screenshots, validation and data storage ER diagrams on [ReadtheDocs](https://tripal-map-helper.readthedocs.io/en/latest/).
