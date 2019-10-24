@@ -3,8 +3,8 @@
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/UofS-Pulse-Binfo/tripal_qtl?include_prereleases)
 
 [![Build Status](https://travis-ci.org/UofS-Pulse-Binfo/tripal_qtl.svg?branch=master)](https://travis-ci.org/UofS-Pulse-Binfo/tripal_qtl)
-[![Maintainability](https://api.codeclimate.com/v1/badges/db8bad906e18da15382e/maintainability)](https://codeclimate.com/github/UofS-Pulse-Binfo/tripal_genetic/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/db8bad906e18da15382e/test_coverage)](https://codeclimate.com/github/UofS-Pulse-Binfo/tripal_qtl/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/b55b4ae19846d9422e46/maintainability)](https://codeclimate.com/github/UofS-Pulse-Binfo/tripal_qtl/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/b55b4ae19846d9422e46/test_coverage)](https://codeclimate.com/github/UofS-Pulse-Binfo/tripal_qtl/test_coverage)
 
 # Tripal QTL (Tripal 3)
 
