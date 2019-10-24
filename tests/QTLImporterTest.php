@@ -120,10 +120,10 @@ class QTLImporterTest extends TripalTestCase {
    */
   private function instantiateImporter($rel_filepath, $run_args) {
     // Load our importer into scope.
-    module_load_include('inc', 'tripal_map_helper', 'includes/TripalImporter/QTLImporter');
+    module_load_include('inc', 'tripal_qtl', 'includes/TripalImporter/QTLImporter');
 
     // Create a new instance of our importer.
-    $path = drupal_get_path('module', 'tripal_map_helper') . '/tests/';
+    $path = drupal_get_path('module', 'tripal_qtl') . '/tests/';
     $file = ['file_local' => DRUPAL_ROOT . '/' . $path . $rel_filepath];
     $importer = new \QTLImporter();
     $importer->create($run_args, $file);
