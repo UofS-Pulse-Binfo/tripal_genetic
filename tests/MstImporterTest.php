@@ -23,7 +23,7 @@ class MstImporterTest extends TripalTestCase {
     $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
 
     // Run the function.
-    module_load_include('inc', 'tripal_map_helper', 'includes/TripalImporter/MSTmapImporter');
+    module_load_include('inc', 'tripal_qtl', 'includes/TripalImporter/MSTmapImporter');
     $importer = new \MSTmapImporter();
     $importer->create($run_args, $file);
     $importer->loadMapMetadata($args);
@@ -88,7 +88,7 @@ class MstImporterTest extends TripalTestCase {
     $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
 
     // Run the function.
-    module_load_include('inc', 'tripal_map_helper', 'includes/TripalImporter/MSTmapImporter');
+    module_load_include('inc', 'tripal_qtl', 'includes/TripalImporter/MSTmapImporter');
     $importer = new \MSTmapImporter();
     $importer->create($run_args, $file);
 
@@ -164,7 +164,7 @@ class MstImporterTest extends TripalTestCase {
     $file = ['file_local' => __DIR__ . '/example_files/single_linkage_group_mst.txt'];
 
     // Run the function.
-    module_load_include('inc', 'tripal_map_helper', 'includes/TripalImporter/MSTmapImporter');
+    module_load_include('inc', 'tripal_qtl', 'includes/TripalImporter/MSTmapImporter');
     $importer = new \MSTmapImporter();
     $importer->create($run_args, $file);
 
@@ -213,7 +213,7 @@ class MstImporterTest extends TripalTestCase {
     ];
 
     // Run the function.
-    module_load_include('inc', 'tripal_map_helper', 'includes/TripalImporter/MSTmapImporter');
+    module_load_include('inc', 'tripal_qtl', 'includes/TripalImporter/MSTmapImporter');
     $importer = new \MSTmapImporter();
     $importer->create($args, $file);
 
