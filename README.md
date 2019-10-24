@@ -23,10 +23,10 @@ This module provides additional fields and data import which provide support for
 4. Create genetic map pages by going to Admin > Content > Tripal Content, click "Publish" and choose "Genetic Map" from the drop-down.
 
 ## Importers
- - [Genetic Maps (MSTmap Format)](https://tripal-map-helper.readthedocs.io/en/latest/MSTmap.html)
+ - [Genetic Maps (MSTmap Format)](https://tripal-qtl.readthedocs.io/en/latest/MSTmap.html)
  - Genetic Markers & Loci: COMING SOON
  - Quantitative Trait Loci (QTL): COMING SOON
 
-## Documentation [![Documentation Status](https://readthedocs.org/projects/tripal-map-helper/badge/?version=latest)](https://tripal-map-helper.readthedocs.io/en/latest/?badge=latest)
+## Documentation [![Documentation Status](https://readthedocs.org/projects/tripal-qtl/badge/?version=latest)](https://tripal-qtl.readthedocs.io/en/latest/?badge=latest)
 
-We have extensive documentation for all our available importers including form screenshots, validation and data storage ER diagrams on [ReadtheDocs](https://tripal-map-helper.readthedocs.io/en/latest/).
+We have extensive documentation for all our available importers including form screenshots, validation and data storage ER diagrams on [ReadtheDocs](https://tripal-qtl.readthedocs.io/en/latest/).
