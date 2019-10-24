@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Tripal Map Helper: Available Documentation
+Tripal QTL: Available Documentation
 ==========================================
 
-The goal of this module is to provide helper functionality for WSU Tripal Map. Specifically, it inserts cvterm and provides data loaders.
+This module provides additional fields and data import which provide support for quantitative trait loci. Additionally, it integrates with Tripal Map through shared vocabulary terms and data storage models.
 
 .. toctree::
    :maxdepth: 2

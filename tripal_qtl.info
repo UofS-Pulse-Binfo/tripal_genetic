@@ -1,0 +1,6 @@
+name = Tripal QTL
+description = Provides support through data importers and fields for quantitative trait loci including the genetic maps they are located on.
+core = 7.x
+package = Tripal Extensions
+
+dependencies[] = tripal
