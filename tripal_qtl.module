@@ -4,3 +4,5 @@
  * @file
  * Provides misc. hook implementations for Tripal Genetic.
  */
+
+require_once 'includes/tripal_qtl.fields.inc';
