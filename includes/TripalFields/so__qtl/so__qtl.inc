@@ -116,22 +116,50 @@ class so__qtl extends ChadoField {
       // @debug dpm($feature_ids, 'feature_ids');
     }
 
+    // Retrieve the type_ids we'll need for our query.
+    $type_id = [
+      'start' => 4360,
+      'end' => 4361,
+    ];
     // Now get the generic information for each QTL.
     $entity->{$field_name}['und'] = [];
     $query = "
-      SELECT f.name, f.uniquename
-      FROM {feature} f 
-      WHERE feature_id IN (:ids)";
-    $QTLs = chado_query($query, [':ids' => $feature_ids])->fetchAll();
+      SELECT
+        qtl.name, qtl.uniquename, qtl.feature_id,
+        pos.mappos as peak_position, lg.name as linkage_group,
+        pstart.value as cistart, pend.value as ciend,
+        map.name as map_name,
+        trait.name as trait_name
+      FROM {feature} qtl
+      LEFT JOIN {featurepos} pos ON pos.feature_id=qtl.feature_id
+      LEFT JOIN {feature} lg ON lg.feature_id=pos.map_feature_id
+      LEFT JOIN {featureposprop} pstart ON pstart.featurepos_id=pos.featurepos_id
+        AND pstart.type_id=:start_type
+      LEFT JOIN {featureposprop} pend ON pend.featurepos_id=pos.featurepos_id
+        AND pend.type_id=:end_type
+      LEFT JOIN {featuremap} map ON map.featuremap_id=pos.featuremap_id
+      LEFT JOIN {feature_cvterm} fc ON fc.feature_id=qtl.feature_id
+      LEFT JOIN {cvterm} trait ON trait.cvterm_id=fc.cvterm_id
+      WHERE qtl.feature_id IN (:ids)";
+    $QTLs = chado_query($query,
+      [':ids' => $feature_ids,
+       ':start_type' => $type_id['start'],
+       ':end_type' => $type_id['end']])->fetchAll();
     foreach ($QTLs as $qtl) {
       $entity->{$field_name}['und'][] = [
         'value' => [
+          'NCIT:C85496' => $qtl->trait_name,
           'schema:name' => $qtl->name,
           'data:2091' => $qtl->uniquename,
+          'data:1278' => $qtl->map_name,
+          'SO:0000018' => $qtl->linkage_group,
+          'MAIN:qtl_peak' => $qtl->peak_position,
+          'MAIN:start' => $qtl->cistart,
+          'MAIN:end' => $qtl->ciend,
         ],
       ];
     }
-    //dpm($entity->{$field_name}['und'], $field_name);
+    // @debug dpm($entity->{$field_name}['und'], $field_name);
   }
 
 
