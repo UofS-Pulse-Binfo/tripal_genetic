@@ -163,6 +163,52 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
       ),
     );
   }
+  // Feature-based Pages (e.g. genetic map, gene, etc.)
+  /*
+  elseif (isset($bundle->data_table) AND ($bundle->data_table == 'feature')) {
+
+    // Specifically, only genetic markers.
+    $term = $bundle->term;
+    if ($term->name == 'genetic_marker') {
+      // QTL List.
+      $columns = ['map', 'trait', 'qtl_name', 'pos', 'confidence_interval', 'peak_lod'];
+      $field_name = 'so__qtl';
+      $field_type = 'so__qtl';
+      $instances[$field_name] =  array(
+        'field_name' => $field_name,
+        'entity_type' => $entity_type,
+        'bundle' => $bundle->name,
+        'label' => 'QTL List',
+        'description' => 'List QTL on associated Tripal Content Pages.',
+        'required' => FALSE,
+        'settings' => array(
+          'term_vocabulary' => 'SO',
+          'term_name' => 'QTL',
+          'term_accession' => '0000771',
+          'auto_attach' => FALSE,
+          'chado_table' => $bundle->data_table,
+          'chado_column' => 'organism_id',
+          'base_table' => $bundle->data_table,
+        ),
+        'widget' => array(
+          'type' => 'so__qtl_widget',
+          'settings' => array(),
+        ),
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden',
+            'type' => 'so__qtl_formatter',
+            'settings' => array(
+              'title' => 'This following table lists quantitative trait loci (QTL) containing this genetic marker within the confidence interval.',
+              'empty' => 'There are no quantitative trait loci (QTL) associated with the current genetic marker.',
+              'show_columns' => array_combine($columns, $columns),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+  */
 
   return $instances;
 }

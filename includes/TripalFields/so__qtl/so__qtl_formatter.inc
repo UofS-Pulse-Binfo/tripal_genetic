@@ -83,6 +83,12 @@ class so__qtl_formatter extends ChadoFieldFormatter {
       }
     }
 
+    // If Tripal Map is installed we would like our QTL to link to it.
+    $tripal_map = FALSE;
+    if (module_exists('tripal_map')) {
+      $tripal_map = TRUE;
+    }
+
     $header = [
       'map' => 'Genetic Map',
       'trait' => 'Trait',
@@ -92,6 +98,9 @@ class so__qtl_formatter extends ChadoFieldFormatter {
       'peak_lod' => 'Peak LOD',
       'additive_effect' => 'Additive Effect',
     ];
+    if ($tripal_map) {
+      $header['link'] = ' ';
+    }
 
     $rows = [];
     foreach ($items as $item) {
@@ -113,6 +122,17 @@ class so__qtl_formatter extends ChadoFieldFormatter {
 
         // Remove headers the admin chose to hide.
         $this->remove_columns($header, $row, $settings);
+
+        // If Tripal Map is available then link to it.
+        if ($tripal_map) {
+          $mapviewer_url = strtr('mapviewer/:map_id/:lg/:qtlname', [
+            ':map_id' => $item['map_id'],
+            ':lg' => $item['value']['SO:0000018'],
+            ':qtlname' => $item['value']['data:2091'],
+          ]);
+          $row['link'] = l('MapViewer', $mapviewer_url,
+            ['attributes' => ['target' => '_blank']]);
+        }
 
         $rows[] = $row;
       }
