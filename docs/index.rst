@@ -14,3 +14,4 @@ This module provides additional fields and data import which provide support for
 
    install
    MSTmap
+   QTLimporter
