@@ -83,7 +83,11 @@ function tripal_qtl_bundle_fields_info($entity_type, $bundle) {
 function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
   $instances = array();
 
+  // Trait Pages
   if (isset($bundle->data_table) AND ($bundle->data_table == 'cvterm')) {
+
+    // QTL List.
+    $columns = ['map', 'qtl_name', 'pos', 'confidence_interval', 'peak_lod', 'additive_effect'];
     $field_name = 'so__qtl';
     $field_type = 'so__qtl';
     $instances[$field_name] =  array(
@@ -110,11 +114,54 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
         'default' => array(
           'label' => 'hidden',
           'type' => 'so__qtl_formatter',
-          'settings' => array(),
+          'settings' => array(
+            'title' => 'The following table lists quantitative trait loci (QTL) available for the current trait.',
+            'empty' => 'There are no quantitative trait loci (QTL) asscoaited with the current trait.',
+            'show_columns' => array_combine($columns, $columns),
+          ),
         ),
       ),
     );
+  }
+  // Genetic Map Pages
+  elseif (isset($bundle->data_table) AND ($bundle->data_table == 'featuremap')) {
 
+    // QTL List.
+    $columns = ['trait', 'qtl_name', 'pos', 'confidence_interval', 'peak_lod', 'additive_effect'];
+    $field_name = 'so__qtl';
+    $field_type = 'so__qtl';
+    $instances[$field_name] =  array(
+      'field_name' => $field_name,
+      'entity_type' => $entity_type,
+      'bundle' => $bundle->name,
+      'label' => 'QTL List',
+      'description' => 'List QTL on associated Tripal Content Pages.',
+      'required' => FALSE,
+      'settings' => array(
+        'term_vocabulary' => 'SO',
+        'term_name' => 'QTL',
+        'term_accession' => '0000771',
+        'auto_attach' => FALSE,
+        'chado_table' => $bundle->data_table,
+        'chado_column' => 'organism_id',
+        'base_table' => $bundle->data_table,
+      ),
+      'widget' => array(
+        'type' => 'so__qtl_widget',
+        'settings' => array(),
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'so__qtl_formatter',
+          'settings' => array(
+            'title' => 'The following table lists quantitative trait loci (QTL) available for the current genetic map.',
+            'empty' => 'There are no quantitative trait loci (QTL) associated with the current genetic map.',
+            'show_columns' => array_combine($columns, $columns),
+          ),
+        ),
+      ),
+    );
   }
 
   return $instances;
