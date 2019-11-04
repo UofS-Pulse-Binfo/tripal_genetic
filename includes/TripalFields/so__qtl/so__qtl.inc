@@ -125,13 +125,21 @@ class so__qtl extends ChadoField {
     }
 
     // Retrieve the type_ids we'll need for our query.
-    $type_id = [
-      'start' => 4360,
-      'end' => 4361,
-      'lod' => 4592,
-      'addt_effect' => 4594,
-      'parent' => 4595,
+    $type_id_obj = [
+      'start' => chado_get_cvterm(['id' => 'MAIN:start']),
+      'end' => chado_get_cvterm(['id' => 'MAIN:end']),
+      'lod' => chado_get_cvterm(['id' => 'MAIN:lod']),
+      'addt_effect' => chado_get_cvterm(['id' => 'MAIN:additive_effect']),
+      'parent' => chado_get_cvterm(['id' => 'MAIN:direction']),
     ];
+    $type_id = [];
+    foreach ($type_id_obj as $key => $obj) {
+      $type_id[$key] = 0;
+      if (is_object($obj)) {
+        $type_id[$key] = $obj->cvterm_id;
+      }
+    }
+
     // Now get the generic information for each QTL.
     $entity->{$field_name}['und'] = [];
     $query = "
