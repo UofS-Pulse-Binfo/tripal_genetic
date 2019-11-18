@@ -108,7 +108,7 @@ m9  5.009
       '#type' => 'select',
       '#title' => 'Map Species',
       '#required' => TRUE,
-      '#description' => "The species the map should be catagorized under based on the parental species. Cchoose interspecific if the parental species are different.",
+      '#description' => "The species the map should be catagorized under based on the parental species. Choose interspecific if the parental species are different.",
       '#options' => chado_get_organism_select_options(FALSE),
     ];
 

@@ -1,3 +1,4 @@
 vendor/
 .env
 docs/_build
+tests/_build

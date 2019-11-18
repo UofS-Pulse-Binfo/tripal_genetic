@@ -124,81 +124,84 @@ class so__qtl extends ChadoField {
       // @debug dpm($feature_ids, 'feature_ids');
     }
 
-    // Retrieve the type_ids we'll need for our query.
-    $type_id_obj = [
-      'start' => chado_get_cvterm(['id' => 'MAIN:start']),
-      'end' => chado_get_cvterm(['id' => 'MAIN:end']),
-      'lod' => chado_get_cvterm(['id' => 'MAIN:lod']),
-      'addt_effect' => chado_get_cvterm(['id' => 'MAIN:additive_effect']),
-      'parent' => chado_get_cvterm(['id' => 'MAIN:direction']),
-    ];
-    $type_id = [];
-    foreach ($type_id_obj as $key => $obj) {
-      $type_id[$key] = 0;
-      if (is_object($obj)) {
-        $type_id[$key] = $obj->cvterm_id;
-      }
-    }
+    if (!empty($feature_ids)) {
 
-    // Now get the generic information for each QTL.
-    $entity->{$field_name}['und'] = [];
-    $query = "
-      SELECT
-        qtl.name, qtl.uniquename, qtl.feature_id as qtl_id,
-        pos.mappos as peak_position, lg.name as linkage_group,
-        pstart.value as cistart, pend.value as ciend,
-        map.name as map_name, map.featuremap_id as map_id,
-        trait.name as trait_name, trait.cvterm_id as trait_id,
-        lod.value as lod, addt_effect.value as addt_effect, parent.value as parent
-      FROM {feature} qtl
-      LEFT JOIN {featurepos} pos ON pos.feature_id=qtl.feature_id
-      LEFT JOIN {feature} lg ON lg.feature_id=pos.map_feature_id
-      LEFT JOIN {featureposprop} pstart ON pstart.featurepos_id=pos.featurepos_id
-        AND pstart.type_id=:start_type
-      LEFT JOIN {featureposprop} pend ON pend.featurepos_id=pos.featurepos_id
-        AND pend.type_id=:end_type
-      LEFT JOIN {featuremap} map ON map.featuremap_id=pos.featuremap_id
-      LEFT JOIN {feature_cvterm} fc ON fc.feature_id=qtl.feature_id
-      LEFT JOIN {cvterm} trait ON trait.cvterm_id=fc.cvterm_id
-      LEFT JOIN {featureprop} lod ON lod.feature_id=qtl.feature_id
-        AND lod.type_id=:lod
-      LEFT JOIN {featureprop} addt_effect ON addt_effect.feature_id=qtl.feature_id
-        AND addt_effect.type_id=:addt_effect
-      LEFT JOIN {featureprop} parent ON parent.feature_id=qtl.feature_id
-        AND parent.type_id=:parent
-      WHERE qtl.feature_id IN (:ids)
-      ORDER BY map.name ASC, trait.name ASC, lg.name ASC, pos.mappos ASC";
-    $QTLs = chado_query($query,
-      [':ids' => $feature_ids,
-       ':start_type' => $type_id['start'],
-       ':end_type' => $type_id['end'],
-       ':lod' => $type_id['lod'],
-       ':addt_effect' => $type_id['addt_effect'],
-       ':parent' => $type_id['parent']])->fetchAll();
-    foreach ($QTLs as $qtl) {
-      $entity->{$field_name}['und'][] = [
-        'value' => [
-          'data:1278' => $qtl->map_name,
-          'NCIT:C85496' => $qtl->trait_name,
-          'schema:name' => $qtl->name,
-          'data:2091' => $qtl->uniquename,
-          'SO:0000018' => $qtl->linkage_group,
-          'MAIN:qtl_peak' => $qtl->peak_position,
-          'MAIN:start' => $qtl->cistart,
-          'MAIN:end' => $qtl->ciend,
-          'MAIN:lod' => $qtl->lod,
-          'MAIN:additive_effect' => $qtl->addt_effect,
-          'MAIN:direction' => $qtl->parent,
-        ],
-        'chado-feature__feature_id' => $qtl->qtl_id,
-        'map_id' => $qtl->map_id,
-        'qtl_id' => $qtl->qtl_id,
-        'trait_id' => $qtl->trait_id,
+      // Retrieve the type_ids we'll need for our query.
+      $type_id_obj = [
+        'start' => chado_get_cvterm(['id' => 'MAIN:start']),
+        'end' => chado_get_cvterm(['id' => 'MAIN:end']),
+        'lod' => chado_get_cvterm(['id' => 'MAIN:lod']),
+        'addt_effect' => chado_get_cvterm(['id' => 'MAIN:additive_effect']),
+        'parent' => chado_get_cvterm(['id' => 'MAIN:direction']),
       ];
-    }
+      $type_id = [];
+      foreach ($type_id_obj as $key => $obj) {
+        $type_id[$key] = 0;
+        if (is_object($obj)) {
+          $type_id[$key] = $obj->cvterm_id;
+        }
+      }
 
-    if (empty($entity->{$field_name}['und'])) {
-      $entity->{$field_name}['und'][0]['value'] = '';
+      // Now get the generic information for each QTL.
+      $entity->{$field_name}['und'] = [];
+      $query = "
+        SELECT
+          qtl.name, qtl.uniquename, qtl.feature_id as qtl_id,
+          pos.mappos as peak_position, lg.name as linkage_group,
+          pstart.value as cistart, pend.value as ciend,
+          map.name as map_name, map.featuremap_id as map_id,
+          trait.name as trait_name, trait.cvterm_id as trait_id,
+          lod.value as lod, addt_effect.value as addt_effect, parent.value as parent
+        FROM {feature} qtl
+        LEFT JOIN {featurepos} pos ON pos.feature_id=qtl.feature_id
+        LEFT JOIN {feature} lg ON lg.feature_id=pos.map_feature_id
+        LEFT JOIN {featureposprop} pstart ON pstart.featurepos_id=pos.featurepos_id
+          AND pstart.type_id=:start_type
+        LEFT JOIN {featureposprop} pend ON pend.featurepos_id=pos.featurepos_id
+          AND pend.type_id=:end_type
+        LEFT JOIN {featuremap} map ON map.featuremap_id=pos.featuremap_id
+        LEFT JOIN {feature_cvterm} fc ON fc.feature_id=qtl.feature_id
+        LEFT JOIN {cvterm} trait ON trait.cvterm_id=fc.cvterm_id
+        LEFT JOIN {featureprop} lod ON lod.feature_id=qtl.feature_id
+          AND lod.type_id=:lod
+        LEFT JOIN {featureprop} addt_effect ON addt_effect.feature_id=qtl.feature_id
+          AND addt_effect.type_id=:addt_effect
+        LEFT JOIN {featureprop} parent ON parent.feature_id=qtl.feature_id
+          AND parent.type_id=:parent
+        WHERE qtl.feature_id IN (:ids)
+        ORDER BY map.name ASC, trait.name ASC, lg.name ASC, pos.mappos ASC";
+      $QTLs = chado_query($query,
+        [':ids' => $feature_ids,
+         ':start_type' => $type_id['start'],
+         ':end_type' => $type_id['end'],
+         ':lod' => $type_id['lod'],
+         ':addt_effect' => $type_id['addt_effect'],
+         ':parent' => $type_id['parent']])->fetchAll();
+      foreach ($QTLs as $qtl) {
+        $entity->{$field_name}['und'][] = [
+          'value' => [
+            'data:1278' => $qtl->map_name,
+            'NCIT:C85496' => $qtl->trait_name,
+            'schema:name' => $qtl->name,
+            'data:2091' => $qtl->uniquename,
+            'SO:0000018' => $qtl->linkage_group,
+            'MAIN:qtl_peak' => $qtl->peak_position,
+            'MAIN:start' => $qtl->cistart,
+            'MAIN:end' => $qtl->ciend,
+            'MAIN:lod' => $qtl->lod,
+            'MAIN:additive_effect' => $qtl->addt_effect,
+            'MAIN:direction' => $qtl->parent,
+          ],
+          'chado-feature__feature_id' => $qtl->qtl_id,
+          'map_id' => $qtl->map_id,
+          'qtl_id' => $qtl->qtl_id,
+          'trait_id' => $qtl->trait_id,
+        ];
+      }
+
+      if (empty($entity->{$field_name}['und'])) {
+        $entity->{$field_name}['und'][0]['value'] = '';
+      }
     }
     // @debug dpm($entity->{$field_name}['und'], $field_name);
   }

@@ -43,7 +43,7 @@ class QTLImporterTest extends TripalTestCase {
     $qtl = chado_query("SELECT * FROM {feature} f
       WHERE f.type_id IN (SELECT cvterm_id FROM {cvterm} WHERE name='QTL')
       AND f.organism_id=:org", [':org' => $mapdetails['organism_id']])->fetchAll();
-    $this->assertCount(4, $qtl, "There was not the expected number of QTL inserted.");
+    $this->assertCount(4, $qtl, "There was not the expected number of QTL inserted (organism_id=".$mapdetails['organism_id'].").");
 
     // -- check the published names match.
     $names = ['LcC23363p108-DTF-SPG2011', 'LcC06044p758-DTF-Preston2009',

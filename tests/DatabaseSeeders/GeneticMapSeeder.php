@@ -37,8 +37,19 @@ class GeneticMapSeeder extends Seeder
       }
 
       // Create an organism for our map.
-      $organism = factory('chado.organism')->create();
+      $organism_values = [
+        'genus' => 'Tripalus',
+        'species' => 'databasica',
+      ];
+      $organism = chado_select_record('organism', ['*'], $organism_values);
+      if ($organism) {
+        $organism = $organism[0];
+      }
+      else {
+        $organism = chado_insert_record('organism', $organism_values);
+      }
       $organism_id = $organism->organism_id;
+      // And connect it to the map.
       chado_insert_record('featuremap_organism', [
         'featuremap_id' => $featuremap_id,
         'organism_id' => $organism_id,
