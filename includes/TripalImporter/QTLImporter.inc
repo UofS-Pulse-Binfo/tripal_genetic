@@ -222,7 +222,7 @@ class QTLImporter extends TripalImporter {
       $line = fgets($in_fh);
 
       // Skip Comments.
-      elseif ($line[0] == ';') {
+      if ($line[0] == ';') {
         continue;
       }
       // Otherwise, it's our header?
