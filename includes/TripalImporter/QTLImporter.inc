@@ -152,11 +152,25 @@ class QTLImporter extends TripalImporter {
       $this->logMessage('An Error was encountered retrieving the genetic map.');
       return FALSE;
     }
+    // Check that the map exists.
+    $exists = chado_query('SELECT true FROM {featuremap} WHERE
+      featuremap_id=:id', [':id' => $featuremap_id])->fetchField();
+    if (!$exists) {
+      $this->logMessage('An Error was encountered retrieving the genetic map.');
+      return FALSE;
+    }
 
     // Retrieve map to add QTL Data to.
     $trait_cv_id = $arguments['trait_cv_id'];
     if (!$trait_cv_id) {
       $this->logMessage('An Error was encountered retrieving the trait cv.');
+      return FALSE;
+    }
+    // Check that the trait exists.
+    $exists = chado_query('SELECT true FROM {cv} WHERE
+      cv_id=:id', [':id' => $trait_cv_id])->fetchField();
+    if (!$exists) {
+      $this->logMessage('An Error was encountered retrieving the genetic map.');
       return FALSE;
     }
 
@@ -203,7 +217,19 @@ class QTLImporter extends TripalImporter {
     $in_fh = fopen($file_path, "r");
 
     // Remove header.
-    $line = fgets($in_fh);
+    $have_header = FALSE;
+    while (!$have_header) {
+      $line = fgets($in_fh);
+
+      // Skip Comments.
+      elseif ($line[0] == ';') {
+        continue;
+      }
+      // Otherwise, it's our header?
+      else {
+        $have_header = TRUE;
+      }
+    }
 
     // Now process each data containing line.
     while ($line = fgets($in_fh)) {
@@ -243,7 +269,7 @@ class QTLImporter extends TripalImporter {
         'CIlod2start' => trim($linetmp[13]),
         'CIlod2end' => trim($linetmp[14]),
       ];
-      // @debug print_r($line);
+      if ($debug) { print_r($line); }
 
       // Lookup Linkage group. Must already exist.
       $linkage_group = [

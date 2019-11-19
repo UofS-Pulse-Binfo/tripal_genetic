@@ -11,11 +11,87 @@ class QTLImporterTest extends TripalTestCase {
   use DBTransaction;
 
   /**
+   * Test the importer with invalid arguements.
+   */
+  public function testRunExpectFail() {
+    // Supress tripal errors
+    putenv("TRIPAL_SUPPRESS_ERRORS=TRUE");
+    ob_start();
+
+    // Prep.
+    $trait_term = factory('chado.cvterm')->create([
+      'name' => 'Days to Flowering',
+    ]);
+    $seeder = GeneticMapSeeder::seed();
+    $mapdetails = $seeder->getDetails();
+
+    // -- With no map.
+    $args = ['trait_cv_id' => $trait_term->cv_id ];
+    $file = 'example_files/qtl.singletrait.tsv';
+    $importer = $this->instantiateImporter($file, $args);
+    $importer->prepareFiles();
+    $success = $importer->run();
+    $this->assertFalse($success,
+      "The importer should not run with no genetic map.");
+
+    // -- With no trait.
+    $args = ['featuremap_name' => $mapdetails['featuremap_id'] ];
+    $file = 'example_files/qtl.singletrait.tsv';
+    $importer = $this->instantiateImporter($file, $args);
+    $importer->prepareFiles();
+    $success = $importer->run();
+    $this->assertFalse($success,
+      "The importer should not run with no trait.");
+
+    // -- With an invalid trait.
+    $args = [
+      'featuremap_name' => $mapdetails['featuremap_id'],
+      'trait_cv_id' => 999999999999999999,
+    ];
+    $file = 'example_files/qtl.singletrait.tsv';
+    $importer = $this->instantiateImporter($file, $args);
+    $importer->prepareFiles();
+    $success = $importer->run();
+    $this->assertFalse($success,
+      "The importer should not run with invalid trait.");
+
+    // -- With an invalid map.
+    $args = [
+      'featuremap_name' => 999999999999999999,
+      'trait_cv_id' => $trait_term->cv_id,
+    ];
+    $file = 'example_files/qtl.singletrait.tsv';
+    $importer = $this->instantiateImporter($file, $args);
+    $importer->prepareFiles();
+    $success = $importer->run();
+    $this->assertFalse($success,
+      "The importer should not run with an invalid map.");
+
+    // -- With an invalid file.
+    $args = [
+      'featuremap_name' => 999999999999999999,
+      'trait_cv_id' => $trait_term->cv_id,
+    ];
+    $file = 'fake/file/mcfakerson.tsv';
+    $importer = $this->instantiateImporter($file, $args);
+    $importer->prepareFiles();
+    $success = $importer->run();
+    $this->assertFalse($success,
+      "The importer should not run without a file.");
+
+    // -- with a test file designed to hit
+    // Clean the buffer and unset tripal errors suppression
+    ob_end_clean();
+    putenv("TRIPAL_SUPPRESS_ERRORS");
+  }
+
+  /**
    * Tests the core importer.
-   *
-   * @group working
    */
   public function testRun() {
+    // Supress tripal errors
+    putenv("TRIPAL_SUPPRESS_ERRORS=TRUE");
+    ob_start();
 
     $seeder = GeneticMapSeeder::seed();
     $mapdetails = $seeder->getDetails();
@@ -63,6 +139,33 @@ class QTLImporterTest extends TripalTestCase {
       $this->assertEquals($mapdetails['featuremap_id'], $pos->featuremap_id,
         "We have a position for the QTL but it is not on our map.");
     }
+
+    // Clean the buffer and unset tripal errors suppression
+    ob_end_clean();
+    putenv("TRIPAL_SUPPRESS_ERRORS");
+  }
+
+  /**
+   * Test the importer form.
+   */
+  public function testForm() {
+
+    // Instatiate the loader.
+    $args = [
+      'featuremap_name' => $mapdetails['featuremap_id'],
+      'trait_cv_id' => $trait_term->cv_id,
+    ];
+    $file = 'example_files/qtl.singletrait.tsv';
+    $importer = $this->instantiateImporter($file, $args);
+    $importer->prepareFiles();
+
+    $form_state = [];
+    $form = $importer->form([], $form_state);
+
+    $this->assertArrayHasKey('featuremap_name', $form,
+      "The form doesn't contain a field for the genetic map name.");
+    $this->assertArrayHasKey('trait_cv_id', $form,
+      "The form doesn't contain a field for the CV containing traits.");
   }
 
   /**
