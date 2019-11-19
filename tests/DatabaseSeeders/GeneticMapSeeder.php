@@ -47,6 +47,7 @@ class GeneticMapSeeder extends Seeder
       }
       else {
         $organism = chado_insert_record('organism', $organism_values);
+        $organism = (object) $organism;
       }
       $organism_id = $organism->organism_id;
       // And connect it to the map.
