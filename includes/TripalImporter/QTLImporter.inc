@@ -160,7 +160,7 @@ class QTLImporter extends TripalImporter {
       return FALSE;
     }
 
-    // Retrieve map to add QTL Data to.
+    // Retrieve trait to add QTL Data to.
     $trait_cv_id = $arguments['trait_cv_id'];
     if (!$trait_cv_id) {
       $this->logMessage('An Error was encountered retrieving the trait cv.');
@@ -170,7 +170,7 @@ class QTLImporter extends TripalImporter {
     $exists = chado_query('SELECT true FROM {cv} WHERE
       cv_id=:id', [':id' => $trait_cv_id])->fetchField();
     if (!$exists) {
-      $this->logMessage('An Error was encountered retrieving the genetic map.');
+      $this->logMessage('An Error was encountered retrieving the trait.');
       return FALSE;
     }
 
