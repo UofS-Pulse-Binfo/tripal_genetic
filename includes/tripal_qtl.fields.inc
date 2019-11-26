@@ -163,8 +163,7 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
       ),
     );
   }
-  // Feature-based Pages (e.g. genetic map, gene, etc.)
-  /*
+  // Feature-based Pages (e.g. genetic marker, gene, etc.)
   elseif (isset($bundle->data_table) AND ($bundle->data_table == 'feature')) {
 
     // Specifically, only genetic markers.
@@ -208,7 +207,6 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
       );
     }
   }
-  */
 
   return $instances;
 }
