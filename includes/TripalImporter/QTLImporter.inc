@@ -274,6 +274,7 @@ class QTLImporter extends TripalImporter {
       // Lookup Linkage group. Must already exist.
       $linkage_group = [
         'name' => $line['linkage_group'],
+        'uniquename' => $line['linkage_group'] . ' from map' . $feature_map_id,
         'type_id' => ['name' => 'linkage_group'],
       ];
       $linkage_group_id = $this->lookup_id('feature',$linkage_group, 'feature_id');
