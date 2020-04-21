@@ -20,9 +20,13 @@ class so__qtl_widget extends ChadoFieldWidget {
   * @see ChadoFieldWidget::form()
   *
   **/
-
   public function form(&$widget, &$form, &$form_state, $langcode, $items, $delta, $element) {
     parent::form($widget, $form, $form_state, $langcode, $items, $delta, $element);
+
+    $widget['msg'] = [
+      '#type' => 'markup',
+      '#markup' => '<p>The QTL List field retrieves data from the database for display but does not provide a way to edit it. To load QTL data use the importer provided.</p>',
+    ];
   }
 
   /**
