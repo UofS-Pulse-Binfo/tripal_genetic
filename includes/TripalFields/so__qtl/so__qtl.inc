@@ -1,10 +1,11 @@
 <?php
 /**
  * @class
- * Purpose:
+ * Purpose: List QTL on various Tripal Content Pages including Genetic Maps,
+ *   Traits, Genetic Markers and Sequence Variants.
  *
- * Data:
- * Assumptions:
+ * Data: See https://tripal-qtl.readthedocs.io/en/latest/QTLimporter.html#data-storage
+ * Assumptions: Assumes QTL are imported by this module.
  */
 class so__qtl extends ChadoField {
 
@@ -109,12 +110,31 @@ class so__qtl extends ChadoField {
     // @debug dpm($entity, 'entity');
     $field_name = $this->instance['field_name'];
 
-    // Retrieve the QTL associated with a given trait.
+    // Retrieve the type_ids we'll need for our query.
+    $type_id_obj = [
+      'start' => chado_get_cvterm(['id' => 'MAIN:start']),
+      'end' => chado_get_cvterm(['id' => 'MAIN:end']),
+      'lod' => chado_get_cvterm(['id' => 'MAIN:lod']),
+      'addt_effect' => chado_get_cvterm(['id' => 'MAIN:additive_effect']),
+      'parent' => chado_get_cvterm(['id' => 'MAIN:direction']),
+      'instance_of' => chado_get_cvterm(['id' => 'OBO_REL:instance_of']),
+    ];
+    $type_id = [];
+    foreach ($type_id_obj as $key => $obj) {
+      $type_id[$key] = 0;
+      if (is_object($obj)) {
+        $type_id[$key] = $obj->cvterm_id;
+      }
+    }
+    // @debug dpm($type_id, 'types');
+
+    // Retrieve the QTL associated with a given TRAIT.
     if ($entity->chado_table == 'cvterm') {
       $feature_ids = chado_query('SELECT feature_id FROM {feature_cvterm} WHERE cvterm_id=:id',
         [':id' => $entity->chado_record_id])->fetchCol();
       // @debug dpm($feature_ids, 'feature_ids');
     }
+    // Retrieve the QTL associated with a given GENETIC MAP.
     elseif ($entity->chado_table == 'featuremap') {
       $feature_ids = chado_query("SELECT qtl.feature_id FROM {featurepos} pos
         LEFT JOIN {feature} qtl ON pos.feature_id=qtl.feature_id
@@ -123,24 +143,35 @@ class so__qtl extends ChadoField {
         [':id' => $entity->chado_record_id])->fetchCol();
       // @debug dpm($feature_ids, 'feature_ids');
     }
+    // Retrieve the QTL a given MARKER/VARIANT falls within.
+    elseif ($entity->chado_table == 'feature') {
+
+      // First find the position of this marker.
+      $marker_pos = chado_query('
+        SELECT pos.mappos
+          FROM chado.feature m
+          LEFT JOIN chado.feature_relationship mrl ON mrl.object_id=m.feature_id AND mrl.type_id=:instance_of
+          LEFT JOIN chado.feature l ON l.feature_id=mrl.subject_id
+          LEFT JOIN chado.featurepos pos ON l.feature_id = pos.feature_id
+          WHERE m.feature_id=:id', [
+            ':id' => $entity->chado_record_id,
+            ':instance_of' => $type_id['instance_of'],
+          ])->fetchField();
+
+      // Now grab all QTL spanning this position.
+      $feature_ids = chado_query('
+        SELECT pos.feature_id as qtl
+          FROM chado.featurepos pos
+          INNER JOIN chado.featureposprop pstart
+            ON pstart.featurepos_id=pos.featurepos_id AND pstart.type_id=:start
+          INNER JOIN chado.featureposprop pend
+            ON pend.featurepos_id=pos.featurepos_id AND pend.type_id=:end
+          WHERE cast(pstart.value as float) <= :pos AND cast(pend.value as float) >= :pos',
+          [':pos' => $marker_pos, ':start' => $type_id['start'], ':end' => $type_id['end']])->fetchCol();
+      // @debug dpm($feature_ids, 'feature_ids');
+    }
 
     if (!empty($feature_ids)) {
-
-      // Retrieve the type_ids we'll need for our query.
-      $type_id_obj = [
-        'start' => chado_get_cvterm(['id' => 'MAIN:start']),
-        'end' => chado_get_cvterm(['id' => 'MAIN:end']),
-        'lod' => chado_get_cvterm(['id' => 'MAIN:lod']),
-        'addt_effect' => chado_get_cvterm(['id' => 'MAIN:additive_effect']),
-        'parent' => chado_get_cvterm(['id' => 'MAIN:direction']),
-      ];
-      $type_id = [];
-      foreach ($type_id_obj as $key => $obj) {
-        $type_id[$key] = 0;
-        if (is_object($obj)) {
-          $type_id[$key] = $obj->cvterm_id;
-        }
-      }
 
       // Now get the generic information for each QTL.
       $entity->{$field_name}['und'] = [];

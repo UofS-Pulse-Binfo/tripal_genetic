@@ -103,7 +103,7 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
         'term_accession' => '0000771',
         'auto_attach' => FALSE,
         'chado_table' => $bundle->data_table,
-        'chado_column' => 'organism_id',
+        'chado_column' => 'cvterm_id',
         'base_table' => $bundle->data_table,
       ),
       'widget' => array(
@@ -143,7 +143,7 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
         'term_accession' => '0000771',
         'auto_attach' => FALSE,
         'chado_table' => $bundle->data_table,
-        'chado_column' => 'organism_id',
+        'chado_column' => 'featuremap_id',
         'base_table' => $bundle->data_table,
       ),
       'widget' => array(
@@ -163,8 +163,7 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
       ),
     );
   }
-  // Feature-based Pages (e.g. genetic map, gene, etc.)
-  /*
+  // Feature-based Pages (e.g. genetic marker, gene, etc.)
   elseif (isset($bundle->data_table) AND ($bundle->data_table == 'feature')) {
 
     // Specifically, only genetic markers.
@@ -187,7 +186,7 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
           'term_accession' => '0000771',
           'auto_attach' => FALSE,
           'chado_table' => $bundle->data_table,
-          'chado_column' => 'organism_id',
+          'chado_column' => 'feature_id',
           'base_table' => $bundle->data_table,
         ),
         'widget' => array(
@@ -208,7 +207,6 @@ function tripal_qtl_bundle_instances_info($entity_type, $bundle) {
       );
     }
   }
-  */
 
   return $instances;
 }
