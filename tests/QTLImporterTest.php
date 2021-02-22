@@ -90,7 +90,7 @@ class QTLImporterTest extends TripalTestCase {
    */
   public function testRun() {
     // Supress tripal errors
-    putenv("TRIPAL_SUPPRESS_ERRORS=FALSE");
+    putenv("TRIPAL_SUPPRESS_ERRORS=TRUE");
     ob_start();
 
     $seeder = GeneticMapSeeder::seed();
@@ -112,7 +112,10 @@ class QTLImporterTest extends TripalTestCase {
     // Now we run the importer!
     $success = $importer->run();
     $this->assertNotFalse($success,
-      "The importer returned an error." . $args);
+      "The importer returned an error.");
+    
+      print_r($args);
+      print_r($file);
 
     // Finally, check that the data is in the correct tables, etc.
     // -- check that the QTL features were created.
