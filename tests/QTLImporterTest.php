@@ -110,9 +110,10 @@ class QTLImporterTest extends TripalTestCase {
     $importer->prepareFiles();
 
     // Now we run the importer!
+    $importer->featuremap_name = $mapdetails['featuremap_id'];
     $success = $importer->run();
     $this->assertNotFalse($success,
-      "The importer returned an error....". $success);
+      "The importer returned an error.");
 
     // Finally, check that the data is in the correct tables, etc.
     // -- check that the QTL features were created.
