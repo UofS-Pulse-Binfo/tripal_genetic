@@ -148,7 +148,8 @@ class QTLImporter extends TripalImporter {
 
     // Retrieve map to add QTL Data to.
     $featuremap_id = $arguments['featuremap_name'];
-    if ($featuremap_id < 1) {
+    return (!$featuremap_id) ? 404 : $featuremap_id;
+    if (!$featuremap_id) {
       $this->logMessage('An Error was encountered retrieving the genetic map.');
       return FALSE;
     }
