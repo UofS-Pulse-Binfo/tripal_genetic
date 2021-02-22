@@ -152,12 +152,10 @@ class QTLImporter extends TripalImporter {
     $file_path = $this->arguments['files'][0]['file_path'];
 
     // Retrieve map to add QTL Data to.
-    $arguments['featuremap_name'] = $this->featuremap_name;
-
     $featuremap_id = $arguments['featuremap_name'];
     if (!$featuremap_id) {
       $this->logMessage('An Error was encountered retrieving the genetic map.');
-      return FALSE;
+      return $this->featuremap_name . '-' . $featuremap_id;
     }
     // Check that the map exists.
     $exists = chado_query('SELECT true FROM {featuremap} WHERE
