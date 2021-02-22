@@ -150,7 +150,7 @@ class QTLImporter extends TripalImporter {
     $featuremap_id = $arguments['featuremap_name'];
     if (!$featuremap_id) {
       $this->logMessage('An Error was encountered retrieving the genetic map.');
-      return 1;
+      return $arguments['featuremap_name'];
     }
     // Check that the map exists.
     $exists = chado_query('SELECT true FROM {featuremap} WHERE
